@@ -1,0 +1,13 @@
+{
+  "db_type": "postgres",
+  "postgres": {
+    "host": "localhost",
+    "port": 5432,
+    "dbname": "ml_genomics",
+    "user": "postgres",
+    "password": "password"
+  },
+  "sqlite": {
+    "path": "data/ml_genomics.db"
+  }
+}
