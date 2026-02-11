@@ -152,13 +152,13 @@ def parse_md_to_docx(md_path, docx_path):
 if __name__ == '__main__':
     # Generate main report
     parse_md_to_docx(
-        os.path.join(BASE_DIR, 'Анализ и разработка методов сегментации сцен и 3D реконструкции по данным глубины_expanded.md'),
+        os.path.join(BASE_DIR, 'Анализ и разработка методов сегментации сцен и 3D реконструкции по данным глубины.md'),
         os.path.join(BASE_DIR, 'Анализ и разработка методов сегментации сцен и 3D реконструкции по данным глубины.docx')
     )
     
     # Generate technical report
     parse_md_to_docx(
-        os.path.join(BASE_DIR, 'ТЕХНИЧЕСКИЙ ОТЧЕТ_expanded.md'),
+        os.path.join(BASE_DIR, 'ТЕХНИЧЕСКИЙ ОТЧЕТ.md'),
         os.path.join(BASE_DIR, 'ТЕХНИЧЕСКИЙ ОТЧЕТ.docx')
     )
     
