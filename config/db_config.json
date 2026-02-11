@@ -1,5 +1,5 @@
 {
-  "db_type": "postgres",
+  "db_type": "sqlite",
   "postgres": {
     "host": "localhost",
     "port": 5432,
@@ -8,6 +8,6 @@
     "password": "password"
   },
   "sqlite": {
-    "path": "data/ml_genomics.db"
+    "path": "data/nyu_depth.db"
   }
 }

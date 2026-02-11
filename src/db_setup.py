@@ -7,32 +7,76 @@ import sqlite3
 
 
 TABLE_SQL = """
-CREATE TABLE IF NOT EXISTS genomic_variants (
+CREATE TABLE IF NOT EXISTS nyu_samples (
     id SERIAL PRIMARY KEY,
-    chrom TEXT NOT NULL,
-    pos INTEGER NOT NULL,
-    gene TEXT,
-    ref TEXT NOT NULL,
-    alt TEXT NOT NULL,
-    gt TEXT,
-    depth INTEGER,
-    effect TEXT,
-    clinsig TEXT
+    rgb_path TEXT NOT NULL,
+    depth_path TEXT NOT NULL,
+    label_path TEXT NOT NULL,
+    split TEXT NOT NULL,
+    width INTEGER NOT NULL,
+    height INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS segmentation_results (
+    id SERIAL PRIMARY KEY,
+    sample_id INTEGER REFERENCES nyu_samples(id),
+    model TEXT NOT NULL,
+    miou REAL,
+    pixel_acc REAL,
+    mean_acc REAL,
+    fw_iou REAL,
+    dice REAL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS reconstruction_results (
+    id SERIAL PRIMARY KEY,
+    sample_id INTEGER REFERENCES nyu_samples(id),
+    method TEXT NOT NULL,
+    rmse REAL,
+    absrel REAL,
+    delta1 REAL,
+    delta2 REAL,
+    delta3 REAL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 """
 
 SQLITE_TABLE_SQL = """
-CREATE TABLE IF NOT EXISTS genomic_variants (
+CREATE TABLE IF NOT EXISTS nyu_samples (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    chrom TEXT NOT NULL,
-    pos INTEGER NOT NULL,
-    gene TEXT,
-    ref TEXT NOT NULL,
-    alt TEXT NOT NULL,
-    gt TEXT,
-    depth INTEGER,
-    effect TEXT,
-    clinsig TEXT
+    rgb_path TEXT NOT NULL,
+    depth_path TEXT NOT NULL,
+    label_path TEXT NOT NULL,
+    split TEXT NOT NULL,
+    width INTEGER NOT NULL,
+    height INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS segmentation_results (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sample_id INTEGER,
+    model TEXT NOT NULL,
+    miou REAL,
+    pixel_acc REAL,
+    mean_acc REAL,
+    fw_iou REAL,
+    dice REAL,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(sample_id) REFERENCES nyu_samples(id)
+);
+
+CREATE TABLE IF NOT EXISTS reconstruction_results (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sample_id INTEGER,
+    method TEXT NOT NULL,
+    rmse REAL,
+    absrel REAL,
+    delta1 REAL,
+    delta2 REAL,
+    delta3 REAL,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(sample_id) REFERENCES nyu_samples(id)
 );
 """
 
@@ -72,7 +116,10 @@ def init_db(config_path: str = "config/db_config.json") -> None:
     if db_type == "sqlite":
         conn = connect_sqlite(config["sqlite"])
         try:
-            conn.execute(SQLITE_TABLE_SQL)
+            for statement in SQLITE_TABLE_SQL.strip().split(";"):
+                stmt = statement.strip()
+                if stmt:
+                    conn.execute(stmt)
             conn.commit()
         finally:
             conn.close()

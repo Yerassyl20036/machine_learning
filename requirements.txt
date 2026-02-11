@@ -2,4 +2,11 @@ numpy
 pandas
 matplotlib
 scikit-learn
+scipy
+h5py
+pillow
+tqdm
+torch
+torchvision
+open3d
 psycopg2
