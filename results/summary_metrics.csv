@@ -1,0 +1,11 @@
+group,metric,value
+segmentation,miou,0.0022118201284687
+segmentation,pixel_acc,0.2797760416666667
+segmentation,mean_acc,0.005703193548566
+segmentation,fw_iou,0.1221110368689383
+segmentation,dice,0.0033608069595919
+reconstruction,rmse,0.0292292667708049
+reconstruction,absrel,0.003345316388489
+reconstruction,delta1,0.999890625
+reconstruction,delta2,0.9999991319444445
+reconstruction,delta3,1.0
