@@ -1,169 +1,198 @@
-# Отчет по теме: анализ и разработка методов сегментации сцен и 3D реконструкции по данным глубины (NYU Depth V2)
+# ML Masters Degree Projects
 
-## Введение
+This workspace contains two independent computer vision research projects:
 
-Задача понимания сцены по данным глубины стала ключевой для робототехники, автономной навигации и смешанной реальности. Наличие глубинной карты позволяет надежно восстанавливать геометрию и повышать устойчивость сегментации в условиях слабого освещения или сложных текстур.
+---
 
-NYU Depth Dataset V2 является одним из наиболее используемых наборов данных для оценки алгоритмов в помещении. Он предоставляет синхронные RGB-D кадры и разметку объектов, что делает его удобной базой для сравнительной проверки как методов семантической сегментации, так и процедур 3D реконструкции.
+## 📂 Project Structure
 
-Цель данной работы — сформировать целостный анализ и базовую методологию решения задачи сегментации сцен и 3D реконструкции по данным глубины на NYU Depth V2, описать используемые модели, параметры и метрики, а также провести сравнительный анализ с современными подходами.
+```
+ML_masters_degree/
+├── nyu_depth_v2/                    # NYU Depth Dataset V2 Project
+│   └── Scene Segmentation & 3D Reconstruction
+│
+└── knee_mri_segmentation/           # Knee MRI Cartilage Segmentation Project
+    └── Medical Image Analysis for Osteoarthritis
+```
 
-## Обзор литературы и сравнительный анализ
+---
 
-В сегментации сцен устойчивым стандартом остаются модели семейства DeepLabv3+ (2018), которые обеспечивают высокое качество благодаря atrous-конволюциям и модулю декодера. Более поздние трансформерные подходы, например SegFormer (2021), повышают точность при меньших вычислительных затратах, а Mask2Former (2021) добавляет унифицированную постановку сегментации с улучшением на сложных классах.
+## 1️⃣ NYU Depth V2: Scene Segmentation and 3D Reconstruction
 
-Для 3D реконструкции по RGB-D доминирует классическая TSDF-фузия с последующей поверхностной реконструкцией, получившая практическую реализацию в Open3D (2018). Более современные нейронные методы, например NeuralRecon (2021), демонстрируют лучшие детали и полноту, но требуют существенно больших вычислительных ресурсов и сложнее в реализации.
+**Directory**: [`nyu_depth_v2/`](nyu_depth_v2/)
 
-Сравнительно, классические пайплайны остаются базовыми и воспроизводимыми в учебных и прикладных проектах, тогда как современные нейросетевые решения обеспечивают более высокое качество, но повышают требования к данным, памяти и инфраструктуре.
+**Topic**: Анализ и разработка методов сегментации сцен и 3D реконструкции по данным глубины
 
-## Методология исследования
+**Dataset**: NYU Depth Dataset V2 (RGB-D indoor scenes, 795 train / 654 test, 40 classes)
 
-### Набор данных
+**Methods**:
+- Semantic segmentation with Tiny U-Net
+- 3D reconstruction using TSDF fusion (Open3D)
 
-Используется NYU Depth Dataset V2, ориентированный на сцены помещений. Применяется стандартный разрез: 795 изображений для обучения и 654 для тестирования, 40 классов семантической разметки.
+**Quick Start**:
+```bash
+cd nyu_depth_v2
+python main.py --mode full
+```
 
-### Предварительная обработка
+**Documentation**:
+- [Project README](nyu_depth_v2/PROJECT_README.md) - Quick start guide
+- [Full Report (Russian)](nyu_depth_v2/README.md) - Academic report
+- [Technical Report (Russian)](nyu_depth_v2/ТЕХНИЧЕСКИЙ%20ОТЧЕТ.md)
 
-- Приведение размеров RGB-D кадров к 320x240 для ускорения обучения.
-- Нормализация RGB по среднему и стандартному отклонению.
-- Масштабирование глубины в метры и маскирование некорректных значений.
-- Аугментации: горизонтальные отражения и легкие цветовые искажения для устойчивости.
+---
 
-### Модели и параметры
+## 2️⃣ Knee MRI: Cartilage Segmentation
 
-**Сегментация сцен (базовый стандарт)**
-- Литературный базис: DeepLabv3+ с ResNet-50 как устойчивый стандарт.
-- Практическая реализация (CPU baseline): компактный Tiny U-Net.
-- Оптимизатор: Adam.
-- Скорость обучения: 1e-3.
-- Размер батча: 4.
-- Число эпох: 2-5 на подвыборке для быстрого прогона.
+**Directory**: [`knee_mri_segmentation/`](knee_mri_segmentation/)
 
-**3D реконструкция по глубине (базовый стандарт)**
-- Пайплайн: TSDF-фузия с извлечением поверхности (marching cubes) на основе Open3D.
-- Воксельный размер: 0.02 м.
-- Объем интеграции: 4 м.
-- Фильтрация выбросов: статистическая (k=20, std=2.0).
+**Topic**: Методы автоматической сегментации костных и хрящевых тканей коленного сустава по данным МРТ
 
-### Практическая часть и воспроизводимость
+**Dataset**: Osteoarthritis Initiative 3D Knee MRI (Kaggle, 5 classes: background, femoral/tibial cartilage, bone, defects)
 
-Ниже приведены команды для построения полного пайплайна на CPU и генерации таблиц метрик и иллюстраций для отчета.
+**Methods**:
+- Classical computer vision baseline (Otsu thresholding + morphology)
+- Multi-class segmentation with size-based classification
 
-1) Загрузка датасета
+**Quick Start**:
+```bash
+cd knee_mri_segmentation
+python main.py --mode full
+```
+
+**Documentation**:
+- [Project Summary](knee_mri_segmentation/PROJECT_SUMMARY_KNEE_MRI.md)
+- [Quickstart Guide](knee_mri_segmentation/KNEE_MRI_QUICKSTART.md)
+- [Full Report (Russian)](knee_mri_segmentation/Методы%20автоматической%20сегментации%20костных%20и%20хрящевых%20тканей%20коленного%20сустава%20по%20данным%20МРТ.md)
+
+---
+
+## 🔍 Project Comparison
+
+| Aspect | NYU Depth V2 | Knee MRI |
+|--------|--------------|----------|
+| **Domain** | RGB-D Scene Understanding | Medical Image Analysis |
+| **Data Type** | RGB-D (color + depth) | MRI (grayscale + masks) |
+| **Task** | Segmentation + 3D Reconstruction | Cartilage Segmentation |
+| **Classes** | 40 (indoor objects) | 5 (tissues) |
+| **Method** | Deep Learning (U-Net) + TSDF | Classical CV (Otsu + morphology) |
+| **Dependencies** | PyTorch, Open3D | OpenCV, NumPy |
+| **Purpose** | General scene understanding | Osteoarthritis diagnosis support |
+
+---
+
+## 🛠️ Technology Stack
+
+### NYU Depth V2
+- **Deep Learning**: PyTorch, TorchVision
+- **3D Processing**: Open3D
+- **Data**: H5Py, SciPy
+- **Database**: PostgreSQL (optional)
+
+### Knee MRI
+- **Computer Vision**: OpenCV
+- **Processing**: NumPy, Pandas
+- **Visualization**: Matplotlib
+- **Data Source**: Kaggle CLI
+
+---
+
+## 📊 Results
+
+Both projects generate:
+- ✅ Quantitative metrics (mIoU, Dice, accuracy)
+- ✅ Visual samples (overlays, predictions)
+- ✅ Confusion matrices
+- ✅ Summary reports (CSV + Markdown)
+
+Results are stored in respective `results/` directories within each project.
+
+---
+
+## 📦 Installation
+
+Each project has independent dependencies:
 
 ```bash
+# NYU Depth V2
+cd nyu_depth_v2
+pip install -r requirements.txt
+
+# Knee MRI
+cd knee_mri_segmentation
+pip install -r requirements.txt
+```
+
+---
+
+## 🚀 Running Projects
+
+Both projects share similar CLI structure:
+
+```bash
+# Download dataset
 python main.py --mode download
-```
 
-Если загрузка недоступна с сервера NYU, скачайте nyu_depth_v2_labeled.mat вручную и поместите файл в data/raw/.
-
-2) Предобработка и экспорт выборки
-
-```bash
+# Preprocess data
 python main.py --mode preprocess
-```
 
-Артефакты появятся в data/processed/nyu_depth_v2 (RGB, depth .npy, метки) и metadata.csv.
-
-3) Сегментация (baseline)
-
-```bash
+# Run segmentation
 python main.py --mode segment
+
+# Full pipeline
+python main.py --mode full
 ```
 
-Метрики сохраняются в results/segmentation/metrics.csv, примеры визуализаций — в results/segmentation/samples/.
+*(NYU also includes `--mode reconstruct` for 3D reconstruction)*
 
-4) 3D реконструкция (baseline)
+---
 
-```bash
-python main.py --mode reconstruct
+## 📝 Documentation Structure
+
+```
+nyu_depth_v2/
+├── PROJECT_README.md              # Quick start (English)
+├── README.md                      # Full report (Russian)
+└── ТЕХНИЧЕСКИЙ ОТЧЕТ.md           # Technical report (Russian)
+
+knee_mri_segmentation/
+├── PROJECT_SUMMARY_KNEE_MRI.md    # Overview (English)
+├── KNEE_MRI_QUICKSTART.md         # Quick start (English)
+└── Методы автоматической сегментации... .md  # Full report (Russian)
 ```
 
-Метрики сохраняются в results/reconstruction/metrics.csv, сетки/рендеры и карты глубины — в results/reconstruction/samples/.
+---
 
-5) Сводная таблица для отчета
+## 🎯 Project Objectives
 
-```bash
-python -m src.nyu_report_assets
-```
+### NYU Depth V2
+- Implement baseline semantic segmentation on RGB-D data
+- Develop 3D reconstruction pipeline using depth maps
+- Evaluate classical and learning-based approaches
+- Generate academic-quality technical reports
 
-Итоговые таблицы: results/summary_metrics.csv и results/summary_metrics.md.
+### Knee MRI
+- Segment cartilage tissues for osteoarthritis analysis
+- Establish classical CV baseline for comparison
+- Prepare dataset for future deep learning experiments
+- Create reproducible evaluation framework
 
-## Результаты и сравнительный анализ
+---
 
-Ниже приведены метрики базового прогона на CPU (Tiny U-Net + TSDF), которые используются как точка отсчета для сравнения с более современными моделями.
+## 👨‍💻 Author
 
-| Метрика | Значение (baseline) |
-|---------|----------------------|
-| mIoU (сегментация) | 0.0022 |
-| Pixel Accuracy (сегментация) | 0.2798 |
-| RMSE, м (глубина/геометрия) | 0.0292 |
-| AbsRel (глубина/геометрия) | 0.0033 |
-| delta < 1.25 (глубина/геометрия) | 0.9999 |
+**Yerassyl**  
+ML Masters Degree  
+February 2025
 
-Сравнительный анализ показывает, что базовый сегментационный стек DeepLabv3+ обеспечивает стабильную точность на классах крупных объектов, тогда как тонкие объекты и детали проигрывают трансформерным моделям. В 3D реконструкции TSDF-фузия обеспечивает устойчивую геометрию крупных поверхностей, но теряет мелкие элементы.
+---
 
-### Примеры визуализаций
+## 📖 Further Reading
 
-![Сегментация (RGB/GT/Pred)](results/segmentation/samples/seg_00240.png)
+- **NYU Depth V2 Project**: See [nyu_depth_v2/README.md](nyu_depth_v2/README.md)
+- **Knee MRI Project**: See [knee_mri_segmentation/PROJECT_SUMMARY_KNEE_MRI.md](knee_mri_segmentation/PROJECT_SUMMARY_KNEE_MRI.md)
+- **Project Architecture**: See `PROJECTS_OVERVIEW.md` (if available)
 
-![Глубина (фильтрованная, colormap)](results/reconstruction/samples/depth_filtered_00240_cmap.png)
+---
 
-![Рендер меша TSDF](results/reconstruction/samples/mesh_00240.png)
-
-### Сравнительные панели
-
-![Сегментация: сравнение RGB/GT/Pred](results/figures/segmentation_compare_00240.png)
-
-![Реконструкция: глубина и меш](results/figures/reconstruction_compare_00240.png)
-
-## Анализ результатов
-
-Полученные базовые значения подтверждают, что в условиях ограниченного объема данных и вычислений классические архитектуры остаются конкурентоспособными. Основная ошибка сегментации наблюдается на границах объектов и на малых классах, что типично для моделей с сильной зависимостью от масштаба.
-
-В реконструкции точность геометрии напрямую зависит от плотности и качества глубинных карт. При увеличении воксельного размера заметно снижается детализация, а при уменьшении возрастает шум и требования к памяти.
-
-## Сравнение с другими исследованиями
-
-Современные трансформерные модели (SegFormer, Mask2Former) демонстрируют более высокие значения mIoU на NYU Depth V2, особенно на редких классах. Нейросетевые решения для реконструкции (NeuralRecon и последующие работы) дают более детальные поверхности и меньшие ошибки глубины, но требуют более сложной подготовки и существенно больших ресурсов по сравнению с TSDF-фузией.
-
-Таким образом, базовый подход остается оправданным для задач, где важны воспроизводимость, простота и ограниченные вычислительные бюджеты, тогда как современные методы следует рассматривать для систем с акцентом на качество деталей.
-
-## Обсуждение
-
-### Главные преимущества
-
-- Простая и воспроизводимая методология, опирающаяся на проверенные базовые модели.
-- Четкая интерпретируемость ошибок сегментации и реконструкции.
-- Низкие требования к вычислительным ресурсам по сравнению с нейронными 3D реконструкторами.
-
-### Сценарии практического применения
-
-- Робототехника и навигация в помещениях (карты препятствий, локализация).
-- AR/VR и mixed reality (быстрое восстановление сцены для взаимодействия).
-- Архитектурная визуализация и инвентаризация помещений.
-
-### Ограничения
-
-- Ограниченная детализация реконструкции при использовании TSDF.
-- Сложности сегментации на редких или мелких классах.
-- Зависимость от качества глубинных данных и корректности калибровки.
-
-## Заключение
-
-В работе сформирован базовый подход к решению задачи сегментации сцен и 3D реконструкции по данным глубины на NYU Depth V2. Методология сочетает устойчивые модели сегментации и практичный геометрический пайплайн реконструкции.
-
-Проведенный анализ показывает, что классические архитектуры и TSDF-фузия обеспечивают надежную базовую точку отсчета, позволяя воспроизводимо сравнивать более современные методы и оценивать их преимущество в качестве.
-
-Дальнейшее развитие предполагает переход к трансформерным сегментаторам и нейронным реконструкторам, а также расширение протокола оценки на дополнительные метрики качества поверхности и устойчивость к шуму глубины.
-
-## Список литературы
-
-1. Chen L. C., Zhu Y., Papandreou G., Schroff F., Adam H. Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation (DeepLabv3+). 2018. https://arxiv.org/abs/1802.02611
-2. Sun K., Xiao B., Liu D., Wang J. Deep High-Resolution Representation Learning for Visual Recognition (HRNet). 2019. https://arxiv.org/abs/1908.07919
-3. Xie E., Wang W., Yu Z., Anandkumar A., Alvarez J. M., Luo P. SegFormer: Simple and Efficient Design for Semantic Segmentation with Transformers. 2021. https://arxiv.org/abs/2105.15203
-4. Cheng B., Schwing A., Kirillov A. Mask2Former for Universal Image Segmentation. 2021. https://arxiv.org/abs/2112.01527
-5. Zeng A., Song S., Nießner M., Fisher M., Xiao J., Funkhouser T. 3DMatch: Learning Local Geometric Descriptors from RGB-D Reconstructions. 2018. https://arxiv.org/abs/1603.08182
-6. Zhou Q. Y., Park J., Koltun V. Open3D: A Modern Library for 3D Data Processing. 2018. http://www.open3d.org
-7. Sun W., Yang N., Liu Y., Tong X., Lei Z., Lan X. NeuralRecon: Real-Time Coherent 3D Reconstruction from Monocular Video. 2021. https://arxiv.org/abs/2104.00681
-8. NYU Depth Dataset V2 (официальная страница набора данных). Дата доступа: 2026-02-11. http://cs.nyu.edu/~silberman/datasets/nyu_depth_v2.html
+**Note**: These two projects are completely independent with different datasets, purposes, and methodologies. They can be run separately without any shared dependencies.
