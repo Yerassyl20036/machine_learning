@@ -95,13 +95,83 @@ python -m src.eda_visualizations
 
 ## Код метрик
 
-Функция `compute_classification_metrics()` в файле `src/eda_visualizations.py` вычисляет все 4 метрики с помощью `sklearn.metrics`:
+### Подготовка данных и обучение моделей
+
+```python
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+
+# Масштабирование признаков
+X = df[FEATURE_NAMES].values
+y = df["kl_grade"].values
+scaler = StandardScaler()
+X_sc = scaler.fit_transform(X)
+
+# Разделение на train/test (75/25, стратифицированное)
+X_train, X_test, y_train, y_test = train_test_split(
+    X_sc, y, test_size=0.25, random_state=42, stratify=y
+)
+
+# Обучение моделей
+lr = LogisticRegression(max_iter=2000, random_state=42, multi_class="multinomial")
+rf = RandomForestClassifier(n_estimators=200, random_state=42, n_jobs=-1)
+lr.fit(X_train, y_train)
+rf.fit(X_train, y_train)
+
+y_pred_lr = lr.predict(X_test)
+y_pred_rf = rf.predict(X_test)
+```
+
+### Вычисление Accuracy, Precision, Recall, F1-score
 
 ```python
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
-acc = accuracy_score(y_test, y_pred)
-prec = precision_score(y_test, y_pred, average="macro")
-rec = recall_score(y_test, y_pred, average="macro")
-f1 = f1_score(y_test, y_pred, average="macro")
+for name, y_pred in [("Logistic Regression", y_pred_lr), ("Random Forest", y_pred_rf)]:
+    acc = accuracy_score(y_test, y_pred)
+    prec_macro = precision_score(y_test, y_pred, average="macro", zero_division=0)
+    rec_macro  = recall_score(y_test, y_pred, average="macro", zero_division=0)
+    f1_macro   = f1_score(y_test, y_pred, average="macro", zero_division=0)
+```
+
+### Per-class отчёт (Precision, Recall, F1 по каждому классу)
+
+```python
+from sklearn.metrics import classification_report
+
+class_labels = ["KL-0", "KL-1", "KL-2", "KL-3", "KL-4"]
+
+for name, y_pred in [("Logistic Regression", y_pred_lr), ("Random Forest", y_pred_rf)]:
+    report = classification_report(
+        y_test, y_pred,
+        target_names=class_labels,
+        zero_division=0,
+        output_dict=True
+    )
+    df_report = pd.DataFrame(report).transpose()
+    df_report.to_csv(f"classification_report_{name}.csv")
+```
+
+### Визуализация метрик (bar chart)
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+short_labels = ["Accuracy", "Precision", "Recall", "F1-score"]
+x = np.arange(len(short_labels))
+width = 0.32
+
+fig, ax = plt.subplots(figsize=(9, 5.5))
+ax.bar(x - width / 2, lr_vals, width, label="Logistic Regression", color="#5A9BD5")
+ax.bar(x + width / 2, rf_vals, width, label="Random Forest", color="#76B947")
+ax.set_ylabel("Score")
+ax.set_title("Метрики качества классификации")
+ax.set_xticks(x)
+ax.set_xticklabels(short_labels)
+ax.set_ylim(0, 1.05)
+ax.legend()
+plt.savefig("classification_metrics.png", dpi=200)
 ```
