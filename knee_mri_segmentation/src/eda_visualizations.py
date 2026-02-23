@@ -31,7 +31,12 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
     ConfusionMatrixDisplay,
+    accuracy_score,
+    classification_report,
     confusion_matrix,
+    f1_score,
+    precision_score,
+    recall_score,
     roc_auc_score,
     roc_curve,
 )
@@ -434,6 +439,103 @@ def plot_confusion_matrices(df: pd.DataFrame, out_dir: str) -> None:
     print(f"  ✓ {path}")
 
 
+def compute_classification_metrics(df: pd.DataFrame, out_dir: str) -> None:
+    """
+    Compute Accuracy, Precision, Recall, F1-score for Logistic Regression
+    and Random Forest classifiers. Save results as CSV and a summary figure.
+    """
+    X = df[FEATURE_NAMES].values
+    y = df["kl_grade"].values
+    scaler = StandardScaler()
+    X_sc = scaler.fit_transform(X)
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X_sc, y, test_size=0.25, random_state=42, stratify=y
+    )
+
+    lr = LogisticRegression(max_iter=2000, random_state=42, multi_class="multinomial")
+    rf = RandomForestClassifier(n_estimators=200, random_state=42, n_jobs=-1)
+    lr.fit(X_train, y_train)
+    rf.fit(X_train, y_train)
+
+    y_pred_lr = lr.predict(X_test)
+    y_pred_rf = rf.predict(X_test)
+
+    class_labels = ["KL-0", "KL-1", "KL-2", "KL-3", "KL-4"]
+
+    # --- Per-model summary metrics ---
+    rows = []
+    for name, y_pred in [("Logistic Regression", y_pred_lr), ("Random Forest", y_pred_rf)]:
+        acc = accuracy_score(y_test, y_pred)
+        prec_macro = precision_score(y_test, y_pred, average="macro", zero_division=0)
+        rec_macro = recall_score(y_test, y_pred, average="macro", zero_division=0)
+        f1_macro = f1_score(y_test, y_pred, average="macro", zero_division=0)
+        prec_weighted = precision_score(y_test, y_pred, average="weighted", zero_division=0)
+        rec_weighted = recall_score(y_test, y_pred, average="weighted", zero_division=0)
+        f1_weighted = f1_score(y_test, y_pred, average="weighted", zero_division=0)
+        rows.append({
+            "Model": name,
+            "Accuracy": round(acc, 4),
+            "Precision (macro)": round(prec_macro, 4),
+            "Recall (macro)": round(rec_macro, 4),
+            "F1-score (macro)": round(f1_macro, 4),
+            "Precision (weighted)": round(prec_weighted, 4),
+            "Recall (weighted)": round(rec_weighted, 4),
+            "F1-score (weighted)": round(f1_weighted, 4),
+        })
+
+    df_summary = pd.DataFrame(rows)
+    csv_path = os.path.join(out_dir, "classification_metrics.csv")
+    df_summary.to_csv(csv_path, index=False)
+    print(f"  ✓ {csv_path}")
+
+    # --- Per-class reports ---
+    for name, y_pred in [("Logistic Regression", y_pred_lr), ("Random Forest", y_pred_rf)]:
+        report = classification_report(
+            y_test, y_pred, target_names=class_labels, zero_division=0, output_dict=True
+        )
+        df_report = pd.DataFrame(report).transpose()
+        safe_name = name.lower().replace(" ", "_")
+        report_path = os.path.join(out_dir, f"classification_report_{safe_name}.csv")
+        df_report.to_csv(report_path)
+        print(f"  ✓ {report_path}")
+
+    # --- Summary figure ---
+    metrics_names = ["Accuracy", "Precision (macro)", "Recall (macro)", "F1-score (macro)"]
+    lr_vals = [df_summary.iloc[0][m] for m in metrics_names]
+    rf_vals = [df_summary.iloc[1][m] for m in metrics_names]
+    short_labels = ["Accuracy", "Precision", "Recall", "F1-score"]
+
+    x = np.arange(len(short_labels))
+    width = 0.32
+
+    fig, ax = plt.subplots(figsize=(9, 5.5))
+    bars1 = ax.bar(x - width / 2, lr_vals, width, label="Logistic Regression", color="#5A9BD5")
+    bars2 = ax.bar(x + width / 2, rf_vals, width, label="Random Forest", color="#76B947")
+
+    ax.set_ylabel("Score", fontsize=12)
+    ax.set_title("Метрики качества классификации (Accuracy, Precision, Recall, F1)",
+                 fontsize=13, fontweight="bold")
+    ax.set_xticks(x)
+    ax.set_xticklabels(short_labels, fontsize=11)
+    ax.set_ylim(0, 1.05)
+    ax.legend(fontsize=11)
+    ax.grid(axis="y", alpha=0.3)
+
+    for bars in [bars1, bars2]:
+        for bar in bars:
+            h = bar.get_height()
+            ax.annotate(f"{h:.3f}", xy=(bar.get_x() + bar.get_width() / 2, h),
+                        xytext=(0, 4), textcoords="offset points",
+                        ha="center", va="bottom", fontsize=9)
+
+    plt.tight_layout()
+    path = os.path.join(out_dir, "classification_metrics.png")
+    plt.savefig(path, dpi=200, bbox_inches="tight")
+    plt.close()
+    print(f"  ✓ {path}")
+
+
 def plot_roc_curves(df: pd.DataFrame, out_dir: str) -> None:
     """
     Fig 7: ROC curves for Logistic Regression vs Random Forest (OvR macro-average).
@@ -679,13 +781,16 @@ def main() -> None:
     print("[7/10] Feature importance (Random Forest) …")
     plot_feature_importance(df, out_dir)
 
-    print("[8/10] Confusion matrices (LR vs RF) …")
+    print("[8/11] Confusion matrices (LR vs RF) …")
     plot_confusion_matrices(df, out_dir)
 
-    print("[9/10] ROC curves …")
+    print("[9/11] ROC curves …")
     plot_roc_curves(df, out_dir)
 
-    print("[10/10] Class distribution & sample grid …")
+    print("[10/11] Classification metrics (Accuracy, Precision, Recall, F1) …")
+    compute_classification_metrics(df, out_dir)
+
+    print("[11/11] Class distribution & sample grid …")
     plot_class_distribution(df, out_dir)
     plot_sample_grid(out_dir)
     plot_split_table_image(df, out_dir)
