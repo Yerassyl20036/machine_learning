@@ -1,0 +1,10 @@
+{
+  "best_classification_model": "Logistic Regression",
+  "best_f1_weighted_percent": 75.19,
+  "regression_metrics": {
+    "r2": 0.8492012062439147,
+    "rmse": 0.37219977093254664,
+    "mae": 0.28791481985842776,
+    "mape_percent": 6.044285279797737
+  }
+}
