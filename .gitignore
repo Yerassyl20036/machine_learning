@@ -14,3 +14,12 @@ __pycache__/
 .DS_Store
 .env
 .env.*
+
+# Datasets (large binary files)
+iris/
+iris.zip
+*.zip
+
+# Binary document outputs
+*.pdf
+*.docx
