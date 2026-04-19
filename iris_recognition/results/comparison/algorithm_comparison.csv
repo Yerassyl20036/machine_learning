@@ -1,0 +1,7 @@
+algorithm,EER,FAR_at_EER,FRR_at_EER,AUC,Accuracy
+Daugman,0.3375,0.3375,0.3375,0.7197,0.9414
+LBP,0.2812,0.2833,0.2792,0.7821,0.7031
+HOG,0.3437,0.35,0.3375,0.7146,0.9258
+ORB,0.3021,0.3042,0.3,0.7683,0.7578
+Ensemble (Weighted),0.3,,,0.7713,
+Ensemble (Stacking),0.2625,,,0.8298,
