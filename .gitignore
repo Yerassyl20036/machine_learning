@@ -23,3 +23,17 @@ iris.zip
 # Binary document outputs
 *.pdf
 *.docx
+
+# Separate git repositories — tracked independently
+knee_mri_segment/
+knee_mri_classification/
+
+# Telegram chat export (contains photos/media, too large)
+ChatExport_2026-04-20/
+
+# Large genomics raw data files (>100MB GitHub limit)
+*.fastq.gz
+*.fastq
+*.bam
+*.sam
+EPJ25-LCRJ/*.vcf.gz

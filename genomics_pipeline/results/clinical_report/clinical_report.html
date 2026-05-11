@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Clinical Genomics Report – EPJ25-LCRJ</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fa; color: #222; }
+  .header { background: linear-gradient(135deg,#1a237e,#283593,#3949AB); color: white; padding: 36px 50px; }
+  .header h1 { font-size: 30px; letter-spacing: -0.5px; }
+  .header .sub { margin-top: 8px; opacity: 0.85; font-size: 14px; line-height: 1.6; }
+  .container { max-width: 1300px; margin: 30px auto; padding: 0 24px 60px; }
+  .cards { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 28px; }
+  .card { background: white; border-radius: 10px; padding: 18px 22px; flex: 1; min-width: 150px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07); border-top: 4px solid; }
+  .card.red { border-color: #D32F2F; } .card.orange { border-color: #E64A19; }
+  .card.amber { border-color: #F57F17; } .card.blue { border-color: #1565C0; }
+  .card.green { border-color: #2E7D32; } .card.purple { border-color: #6A1B9A; }
+  .card .val { font-size: 30px; font-weight: 700; }
+  .card.red .val { color: #D32F2F; } .card.orange .val { color: #E64A19; }
+  .card.amber .val { color: #F57F17; } .card.blue .val { color: #1565C0; }
+  .card.green .val { color: #2E7D32; } .card.purple .val { color: #6A1B9A; }
+  .card .lbl { font-size: 11px; color: #777; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .section { background: white; border-radius: 10px; padding: 26px; margin-bottom: 24px;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+  .section h2 { color: #1a237e; border-bottom: 2px solid #e8eaf6; padding-bottom: 10px; margin-bottom: 18px; font-size: 18px; }
+  .section h3 { color: #283593; margin-bottom: 12px; font-size: 15px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { background: #e8eaf6; color: #1a237e; padding: 9px 12px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; }
+  td { padding: 7px 12px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+  tr:hover td { background: #fafbff; }
+  .figures { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
+  .fig-box { flex: 1; min-width: 280px; }
+  .fig-box img { width: 100%; border-radius: 8px; box-shadow: 0 1px 5px rgba(0,0,0,0.1); }
+  .fig-box p { text-align: center; font-size: 11px; color: #777; margin-top: 6px; }
+  .tbl-wrap { overflow-x: auto; }
+  .tag { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 10px;
+           font-weight: 600; background: #e3f2fd; color: #1565C0; }
+  footer { text-align: center; color: #aaa; font-size: 12px; padding: 24px; border-top: 1px solid #e0e0e0; margin-top: 20px; }
+  .alert { background: #FFF3E0; border-left: 4px solid #E64A19; padding: 12px 16px; border-radius: 6px; font-size: 13px; color: #BF360C; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Clinical Genomics Report</h1>
+  <div class="sub">
+    <strong>Sample:</strong> EPJ25-LCRJ &nbsp;|&nbsp;
+    <strong>Analysis:</strong> Whole Exome Sequencing (WES) &nbsp;|&nbsp;
+    <strong>Reference:</strong> GRCh38/hg38 &nbsp;|&nbsp;
+    <strong>Kit:</strong> IDT 3B v2 &nbsp;|&nbsp;
+    <strong>Date:</strong> April 20, 2026<br>
+    <strong>Pipeline:</strong> FASTQ → fastp QC → BWA-MEM → GATK HaplotypeCaller → VQSR → VEP Annotation
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Summary Cards -->
+  <div class="cards">
+    <div class="card blue"><div class="val">60,730</div><div class="lbl">Total Variants (Ann.)</div></div>
+    <div class="card green"><div class="val">37,695</div><div class="lbl">PASS Variants</div></div>
+    <div class="card red"><div class="val">27</div><div class="lbl">Pathogenic / Likely Path.</div></div>
+    <div class="card amber"><div class="val">22647</div><div class="lbl">VUS</div></div>
+    <div class="card purple"><div class="val">5</div><div class="lbl">CNV Events</div></div>
+    <div class="card orange"><div class="val">201×</div><div class="lbl">Mean Depth</div></div>
+  </div>
+
+  <!-- QC Section -->
+  <div class="section">
+    <h2>🧬 Sequencing QC Summary</h2>
+    <div class="figures">
+      <div class="fig-box">
+        <img src="../figures/qc_quality_bars.png" alt="Quality Metrics">
+        <p>Sequencing Quality Metrics</p>
+      </div>
+      <div class="fig-box">
+        <img src="../figures/qc_coverage_profile.png" alt="Coverage">
+        <p>Coverage Profile</p>
+      </div>
+      <div class="fig-box">
+        <img src="../figures/qc_variant_composition.png" alt="Variant Types">
+        <p>Variant Composition</p>
+      </div>
+    </div>
+    <br>
+    <div class="tbl-wrap">
+      <table><thead><tr><th>Metric</th><th>Value</th></tr></thead>
+      <tbody><tr><td>Sample Id</td><td><strong>EPJ25-LCRJ</strong></td></tr><tr><td>Reference</td><td><strong>grch38</strong></td></tr><tr><td>Kit</td><td><strong>idt_3b_v2</strong></td></tr><tr><td>Target Region</td><td><strong>35392153</strong></td></tr><tr><td>Total Yield (bp)</td><td><strong>12483539123</strong></td></tr><tr><td>Q20 (%)</td><td><strong>99.79</strong></td></tr><tr><td>Q30 (%)</td><td><strong>98.58</strong></td></tr><tr><td>Initial Mappable Reads (%)</td><td><strong>99.76</strong></td></tr><tr><td>Non Redundant Reads (%)</td><td><strong>89.37</strong></td></tr><tr><td>On-Target Reads (%)</td><td><strong>102.79</strong></td></tr><tr><td>Mean Depth (x)</td><td><strong>201.41</strong></td></tr><tr><td>1X Coverage (%)</td><td><strong>99.7</strong></td></tr><tr><td>2X Coverage (%)</td><td><strong>99.6</strong></td></tr><tr><td>5X Coverage (%)</td><td><strong>99.4</strong></td></tr><tr><td>10X Coverage (%)</td><td><strong>99.2</strong></td></tr><tr><td>20X Coverage (%)</td><td><strong>98.7</strong></td></tr><tr><td>30X Coverage (%)</td><td><strong>98.2</strong></td></tr><tr><td>40X Coverage (%)</td><td><strong>97.7</strong></td></tr><tr><td>50X Coverage (%)</td><td><strong>96.9</strong></td></tr><tr><td>SNP</td><td><strong>64157</strong></td></tr><tr><td>INDEL</td><td><strong>12108</strong></td></tr><tr><td>TsTv</td><td><strong>2.42</strong></td></tr><tr><td>Het/Hom</td><td><strong>1.74</strong></td></tr></tbody></table>
+    </div>
+  </div>
+
+  <!-- Variant Analysis -->
+  <div class="section">
+    <h2>📊 Variant Analysis</h2>
+    <div class="figures">
+      <div class="fig-box">
+        <img src="../figures/consequence_distribution.png" alt="Consequences">
+        <p>Consequence Distribution</p>
+      </div>
+      <div class="fig-box">
+        <img src="../figures/acmg_classes.png" alt="ACMG">
+        <p>ACMG Classification</p>
+      </div>
+    </div>
+    <br>
+    <div class="figures">
+      <div class="fig-box">
+        <img src="../figures/vaf_depth_scatter.png" alt="VAF vs Depth">
+        <p>VAF vs Read Depth</p>
+      </div>
+      <div class="fig-box">
+        <img src="../figures/chromosome_burden.png" alt="Chromosomes">
+        <p>Variants by Chromosome</p>
+      </div>
+    </div>
+    <br>
+    <div class="fig-box" style="max-width:100%">
+      <img src="../figures/top_pathogenic_genes.png" alt="Top Genes">
+      <p>Top Genes with Pathogenic/LP Variants</p>
+    </div>
+  </div>
+
+  <!-- Clinical Pathogenic Table -->
+  <div class="section">
+    <h2>⚠️ Pathogenic / Likely Pathogenic Variants (27)</h2>
+    
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Gene</th><th>Locus</th><th>Change</th><th>GT</th>
+          <th>Consequence</th><th>cDNA</th><th>Protein</th>
+          <th>ACMG</th><th>ClinVar</th><th>Disease</th><th>gnomAD AF</th>
+        </tr></thead>
+        <tbody><tr>
+          <td><strong>USH2A</strong></td>
+          <td>1:216350564</td>
+          <td style="font-family:monospace;font-size:11px">C>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_007123.6:c.784+14389G>T</td>
+          <td style="font-size:10px">NP_009054.6:p.?</td>
+          <td><span style="background:#FFE0B2;color:#E64A19;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #E64A1940">Likely Pathogenic</span></td>
+          <td style="font-size:11px">Likely pathogenic||Likely pathogenic||Uncertain significance||Uncertain significance</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Usher syndrome, type 2A</td>
+          <td style="font-size:10px">7.89e-04</td>
+        </tr>
+<tr>
+          <td><strong>USH2A</strong></td>
+          <td>1:216350564</td>
+          <td style="font-family:monospace;font-size:11px">C>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_007123.6:c.784+14389G>T</td>
+          <td style="font-size:10px">NP_009054.6:p.?</td>
+          <td><span style="background:#FFE0B2;color:#E64A19;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #E64A1940">Likely Pathogenic</span></td>
+          <td style="font-size:11px">Likely pathogenic||Likely pathogenic||Uncertain significance||Uncertain significance</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Retinitis pigmentosa 39</td>
+          <td style="font-size:10px">7.89e-04</td>
+        </tr>
+<tr>
+          <td><strong>USH2A</strong></td>
+          <td>1:216350564</td>
+          <td style="font-family:monospace;font-size:11px">C>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_206933.4:c.784+14389G>T</td>
+          <td style="font-size:10px">NP_996816.3:p.?</td>
+          <td><span style="background:#FFE0B2;color:#E64A19;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #E64A1940">Likely Pathogenic</span></td>
+          <td style="font-size:11px">Likely pathogenic||Likely pathogenic||Uncertain significance||Uncertain significance</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Usher syndrome, type 2A</td>
+          <td style="font-size:10px">7.89e-04</td>
+        </tr>
+<tr>
+          <td><strong>USH2A</strong></td>
+          <td>1:216350564</td>
+          <td style="font-family:monospace;font-size:11px">C>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_206933.4:c.784+14389G>T</td>
+          <td style="font-size:10px">NP_996816.3:p.?</td>
+          <td><span style="background:#FFE0B2;color:#E64A19;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #E64A1940">Likely Pathogenic</span></td>
+          <td style="font-size:11px">Likely pathogenic||Likely pathogenic||Uncertain significance||Uncertain significance</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Retinitis pigmentosa 39</td>
+          <td style="font-size:10px">7.89e-04</td>
+        </tr>
+<tr>
+          <td><strong>TGM4</strong></td>
+          <td>3:44901672</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">stop_gained</td>
+          <td style="font-size:10px">NM_003241.4:c.806G>A</td>
+          <td style="font-size:10px">NP_003232.2:p.Trp269Ter</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">Likely pathogenic</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0079</td>
+        </tr>
+<tr>
+          <td><strong>ZNF717</strong></td>
+          <td>3:75741671</td>
+          <td style="font-family:monospace;font-size:11px">A>G</td>
+          <td>0/1</td>
+          <td style="font-size:11px">synonymous_variant</td>
+          <td style="font-size:10px">NM_001128223.3:c.123T>C</td>
+          <td style="font-size:10px">NP_001121695.1:p.Asp41=</td>
+          <td><span style="background:#C8E6C9;color:#1B5E20;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #1B5E2040">Benign</span></td>
+          <td style="font-size:11px">Pathogenic</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.6843</td>
+        </tr>
+<tr>
+          <td><strong>ZNF717</strong></td>
+          <td>3:75741671</td>
+          <td style="font-family:monospace;font-size:11px">A>G</td>
+          <td>0/1</td>
+          <td style="font-size:11px">synonymous_variant</td>
+          <td style="font-size:10px">NM_001290208.3:c.123T>C</td>
+          <td style="font-size:10px">NP_001277137.1:p.Asp41=</td>
+          <td><span style="background:#C8E6C9;color:#1B5E20;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #1B5E2040">Benign</span></td>
+          <td style="font-size:11px">Pathogenic</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.6843</td>
+        </tr>
+<tr>
+          <td><strong>ZNF717</strong></td>
+          <td>3:75741671</td>
+          <td style="font-family:monospace;font-size:11px">A>G</td>
+          <td>0/1</td>
+          <td style="font-size:11px">5_prime_UTR_variant</td>
+          <td style="font-size:10px">NM_001290209.3:c.-28T>C</td>
+          <td style="font-size:10px">NP_001277138.1:p.?</td>
+          <td><span style="background:#C8E6C9;color:#1B5E20;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #1B5E2040">Benign</span></td>
+          <td style="font-size:11px">Pathogenic</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.6843</td>
+        </tr>
+<tr>
+          <td><strong>ZNF717</strong></td>
+          <td>3:75741671</td>
+          <td style="font-family:monospace;font-size:11px">A>G</td>
+          <td>0/1</td>
+          <td style="font-size:11px">synonymous_variant</td>
+          <td style="font-size:10px">NM_001290210.2:c.123T>C</td>
+          <td style="font-size:10px">NP_001277139.1:p.Asp41=</td>
+          <td><span style="background:#C8E6C9;color:#1B5E20;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #1B5E2040">Benign</span></td>
+          <td style="font-size:11px">Pathogenic</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.6843</td>
+        </tr>
+<tr>
+          <td><strong>ZNF717</strong></td>
+          <td>3:75741671</td>
+          <td style="font-family:monospace;font-size:11px">A>G</td>
+          <td>0/1</td>
+          <td style="font-size:11px">synonymous_variant</td>
+          <td style="font-size:10px">NM_001324026.2:c.123T>C</td>
+          <td style="font-size:10px">NP_001310955.1:p.Asp41=</td>
+          <td><span style="background:#C8E6C9;color:#1B5E20;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #1B5E2040">Benign</span></td>
+          <td style="font-size:11px">Pathogenic</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.6843</td>
+        </tr>
+<tr>
+          <td><strong>ZNF717</strong></td>
+          <td>3:75741671</td>
+          <td style="font-family:monospace;font-size:11px">A>G</td>
+          <td>0/1</td>
+          <td style="font-size:11px">synonymous_variant</td>
+          <td style="font-size:10px">NM_001324027.1:c.123T>C</td>
+          <td style="font-size:10px">NP_001310956.1:p.Asp41=</td>
+          <td><span style="background:#C8E6C9;color:#1B5E20;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #1B5E2040">Benign</span></td>
+          <td style="font-size:11px">Pathogenic</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.6843</td>
+        </tr>
+<tr>
+          <td><strong>ZNF717</strong></td>
+          <td>3:75741671</td>
+          <td style="font-family:monospace;font-size:11px">A>G</td>
+          <td>0/1</td>
+          <td style="font-size:11px">synonymous_variant</td>
+          <td style="font-size:10px">NM_001324028.1:c.102T>C</td>
+          <td style="font-size:10px">NP_001310957.1:p.Asp34=</td>
+          <td><span style="background:#C8E6C9;color:#1B5E20;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #1B5E2040">Benign</span></td>
+          <td style="font-size:11px">Pathogenic</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.6843</td>
+        </tr>
+<tr>
+          <td><strong>MIR4273</strong></td>
+          <td>3:75741671</td>
+          <td style="font-family:monospace;font-size:11px">A>G</td>
+          <td>0/1</td>
+          <td style="font-size:11px">downstream_gene_variant</td>
+          <td style="font-size:10px">NR_036235.1:c.?</td>
+          <td style="font-size:10px">-:p.?</td>
+          <td><span style="background:#C8E6C9;color:#1B5E20;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #1B5E2040">Benign</span></td>
+          <td style="font-size:11px">Pathogenic</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.6843</td>
+        </tr>
+<tr>
+          <td><strong>SLC26A4</strong></td>
+          <td>7:107683453</td>
+          <td style="font-family:monospace;font-size:11px">A>G</td>
+          <td>0/1</td>
+          <td style="font-size:11px">splice_acceptor_variant</td>
+          <td style="font-size:10px">NM_000441.2:c.919-2A>G</td>
+          <td style="font-size:10px">NP_000432.1:p.?</td>
+          <td><span style="background:#FFCDD2;color:#D32F2F;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #D32F2F40">Pathogenic</span></td>
+          <td style="font-size:11px">Pathogenic||Pathogenic||Pathogenic||Pathogenic||Pathogenic||Likely pathogenic||Pathogenic</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Pendred syndrome</td>
+          <td style="font-size:10px">1.90e-04</td>
+        </tr>
+<tr>
+          <td><strong>SLC26A4</strong></td>
+          <td>7:107683453</td>
+          <td style="font-family:monospace;font-size:11px">A>G</td>
+          <td>0/1</td>
+          <td style="font-size:11px">splice_acceptor_variant</td>
+          <td style="font-size:10px">NM_000441.2:c.919-2A>G</td>
+          <td style="font-size:10px">NP_000432.1:p.?</td>
+          <td><span style="background:#FFCDD2;color:#D32F2F;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #D32F2F40">Pathogenic</span></td>
+          <td style="font-size:11px">Pathogenic||Pathogenic||Pathogenic||Pathogenic||Pathogenic||Likely pathogenic||Pathogenic</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Deafness, autosomal recessive 4, with enlarged vestibular aq</td>
+          <td style="font-size:10px">1.90e-04</td>
+        </tr>
+<tr>
+          <td><strong>ADRA2A</strong></td>
+          <td>10:111079821</td>
+          <td style="font-family:monospace;font-size:11px">A>G</td>
+          <td>1|1</td>
+          <td style="font-size:11px">3_prime_UTR_variant</td>
+          <td style="font-size:10px">NM_000681.4:c.*427A>G</td>
+          <td style="font-size:10px">NP_000672.3:p.?</td>
+          <td><span style="background:#C8E6C9;color:#1B5E20;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #1B5E2040">Benign</span></td>
+          <td style="font-size:11px">Pathogenic</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Lipodystrophy, familial partial, type 8</td>
+          <td style="font-size:10px">0.7750</td>
+        </tr>
+<tr>
+          <td><strong>CATSPER1</strong></td>
+          <td>11:66025908</td>
+          <td style="font-family:monospace;font-size:11px">TC>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">frameshift_variant</td>
+          <td style="font-size:10px">NM_053054.4:c.471del</td>
+          <td style="font-size:10px">NP_444282.3:p.Asn158IlefsTer177</td>
+          <td><span style="background:#FFE0B2;color:#E64A19;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #E64A1940">Likely Pathogenic</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Spermatogenic failure 7</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>ACADS</strong></td>
+          <td>12:120727115</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_000017.4:c.136C>T</td>
+          <td style="font-size:10px">NP_000008.1:p.Arg46Trp</td>
+          <td><span style="background:#FFCDD2;color:#D32F2F;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #D32F2F40">Pathogenic</span></td>
+          <td style="font-size:11px">Pathogenic/Likely pathogenic||Likely pathogenic||Pathogenic||Likely pathogenic</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Acyl-CoA dehydrogenase, short-chain, deficiency of</td>
+          <td style="font-size:10px">1.12e-04</td>
+        </tr>
+<tr>
+          <td><strong>ACADS</strong></td>
+          <td>12:120727115</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_001302554.2:c.136C>T</td>
+          <td style="font-size:10px">NP_001289483.1:p.Arg46Trp</td>
+          <td><span style="background:#FFCDD2;color:#D32F2F;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #D32F2F40">Pathogenic</span></td>
+          <td style="font-size:11px">Pathogenic/Likely pathogenic||Likely pathogenic||Pathogenic||Likely pathogenic</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Acyl-CoA dehydrogenase, short-chain, deficiency of</td>
+          <td style="font-size:10px">1.12e-04</td>
+        </tr>
+<tr>
+          <td><strong>TGM5</strong></td>
+          <td>15:43260232</td>
+          <td style="font-family:monospace;font-size:11px">TG>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_004245.4:c.190+167del</td>
+          <td style="font-size:10px">NP_004236.1:p.?</td>
+          <td><span style="background:#FFE0B2;color:#E64A19;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #E64A1940">Likely Pathogenic</span></td>
+          <td style="font-size:11px">Pathogenic/Likely pathogenic||Pathogenic</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Peeling skin syndrome 2</td>
+          <td style="font-size:10px">2.63e-05</td>
+        </tr>
+<tr>
+          <td><strong>TGM5</strong></td>
+          <td>15:43260232</td>
+          <td style="font-family:monospace;font-size:11px">TG>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">frameshift_variant</td>
+          <td style="font-size:10px">NM_201631.4:c.255del</td>
+          <td style="font-size:10px">NP_963925.2:p.Ser86AlafsTer17</td>
+          <td><span style="background:#FFCDD2;color:#D32F2F;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #D32F2F40">Pathogenic</span></td>
+          <td style="font-size:11px">Pathogenic/Likely pathogenic||Pathogenic</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Peeling skin syndrome 2</td>
+          <td style="font-size:10px">2.63e-05</td>
+        </tr>
+<tr>
+          <td><strong>BCR</strong></td>
+          <td>22:23311788</td>
+          <td style="font-family:monospace;font-size:11px">T>TCCGG</td>
+          <td>0/1</td>
+          <td style="font-size:11px">frameshift_variant</td>
+          <td style="font-size:10px">NM_004327.4:c.3275_3278dup</td>
+          <td style="font-size:10px">NP_004318.3:p.Val1094ArgfsTer17</td>
+          <td><span style="background:#FFE0B2;color:#E64A19;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #E64A1940">Likely Pathogenic</span></td>
+          <td style="font-size:11px">Uncertain significance||Uncertain significance</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Leukemia, chronic myeloid, Philadelphia chromosome positive,</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>BCR</strong></td>
+          <td>22:23311788</td>
+          <td style="font-family:monospace;font-size:11px">T>TCCGG</td>
+          <td>0/1</td>
+          <td style="font-size:11px">frameshift_variant</td>
+          <td style="font-size:10px">NM_004327.4:c.3275_3278dup</td>
+          <td style="font-size:10px">NP_004318.3:p.Val1094ArgfsTer17</td>
+          <td><span style="background:#FFE0B2;color:#E64A19;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #E64A1940">Likely Pathogenic</span></td>
+          <td style="font-size:11px">Uncertain significance||Uncertain significance</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Leukemia, acute lymphocytic, Philadelphia chromosome positiv</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>BCR</strong></td>
+          <td>22:23311788</td>
+          <td style="font-family:monospace;font-size:11px">T>TCCGG</td>
+          <td>0/1</td>
+          <td style="font-size:11px">frameshift_variant</td>
+          <td style="font-size:10px">NM_021574.3:c.3143_3146dup</td>
+          <td style="font-size:10px">NP_067585.2:p.Val1050ArgfsTer17</td>
+          <td><span style="background:#FFE0B2;color:#E64A19;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #E64A1940">Likely Pathogenic</span></td>
+          <td style="font-size:11px">Uncertain significance||Uncertain significance</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Leukemia, chronic myeloid, Philadelphia chromosome positive,</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>BCR</strong></td>
+          <td>22:23311788</td>
+          <td style="font-family:monospace;font-size:11px">T>TCCGG</td>
+          <td>0/1</td>
+          <td style="font-size:11px">frameshift_variant</td>
+          <td style="font-size:10px">NM_021574.3:c.3143_3146dup</td>
+          <td style="font-size:10px">NP_067585.2:p.Val1050ArgfsTer17</td>
+          <td><span style="background:#FFE0B2;color:#E64A19;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #E64A1940">Likely Pathogenic</span></td>
+          <td style="font-size:11px">Uncertain significance||Uncertain significance</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Leukemia, acute lymphocytic, Philadelphia chromosome positiv</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>RBMX</strong></td>
+          <td>X:136877987</td>
+          <td style="font-family:monospace;font-size:11px">G>GAA</td>
+          <td>0/1</td>
+          <td style="font-size:11px">frameshift_variant</td>
+          <td style="font-size:10px">NM_002139.4:c.315_316insTT</td>
+          <td style="font-size:10px">NP_002130.2:p.Pro106PhefsTer32</td>
+          <td><span style="background:#FFE0B2;color:#E64A19;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #E64A1940">Likely Pathogenic</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Intellectual developmental disorder, X-linked syndromic, Sha</td>
+          <td style="font-size:10px">9.59e-05</td>
+        </tr>
+<tr>
+          <td><strong>RBMX</strong></td>
+          <td>X:136877987</td>
+          <td style="font-family:monospace;font-size:11px">G>GAA</td>
+          <td>0/1</td>
+          <td style="font-size:11px">frameshift_variant</td>
+          <td style="font-size:10px">NM_002139.4:c.315_316insTT</td>
+          <td style="font-size:10px">NP_002130.2:p.Pro106PhefsTer32</td>
+          <td><span style="background:#FFE0B2;color:#E64A19;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #E64A1940">Likely Pathogenic</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Intellectual developmental disorder, X-linked syndromic, Gus</td>
+          <td style="font-size:10px">9.59e-05</td>
+        </tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- VUS Table -->
+  <div class="section">
+    <h2>🔍 Variants of Uncertain Significance – VUS (22647)</h2>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Gene</th><th>Locus</th><th>Change</th><th>GT</th>
+          <th>Consequence</th><th>cDNA</th><th>Protein</th>
+          <th>ACMG</th><th>ClinVar</th><th>Disease</th><th>gnomAD AF</th>
+        </tr></thead>
+        <tbody><tr>
+          <td><strong>AGRN</strong></td>
+          <td>1:1045893</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_001305275.2:c.2680+17G>A</td>
+          <td style="font-size:10px">NP_001292204.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">Likely benign</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Myasthenic syndrome, congenital, 8, with pre- and postsynapt</td>
+          <td style="font-size:10px">1.31e-05</td>
+        </tr>
+<tr>
+          <td><strong>AGRN</strong></td>
+          <td>1:1045893</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_001364727.2:c.2365+17G>A</td>
+          <td style="font-size:10px">NP_001351656.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">Likely benign</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Myasthenic syndrome, congenital, 8, with pre- and postsynapt</td>
+          <td style="font-size:10px">1.31e-05</td>
+        </tr>
+<tr>
+          <td><strong>AGRN</strong></td>
+          <td>1:1045893</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_198576.4:c.2680+17G>A</td>
+          <td style="font-size:10px">NP_940978.2:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">Likely benign</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Myasthenic syndrome, congenital, 8, with pre- and postsynapt</td>
+          <td style="font-size:10px">1.31e-05</td>
+        </tr>
+<tr>
+          <td><strong>AGRN</strong></td>
+          <td>1:1047541</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_001305275.2:c.3517-32C>T</td>
+          <td style="font-size:10px">NP_001292204.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Myasthenic syndrome, congenital, 8, with pre- and postsynapt</td>
+          <td style="font-size:10px">6.50e-04</td>
+        </tr>
+<tr>
+          <td><strong>AGRN</strong></td>
+          <td>1:1047541</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_001364727.2:c.3202-32C>T</td>
+          <td style="font-size:10px">NP_001351656.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Myasthenic syndrome, congenital, 8, with pre- and postsynapt</td>
+          <td style="font-size:10px">6.50e-04</td>
+        </tr>
+<tr>
+          <td><strong>AGRN</strong></td>
+          <td>1:1047541</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_198576.4:c.3517-32C>T</td>
+          <td style="font-size:10px">NP_940978.2:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Myasthenic syndrome, congenital, 8, with pre- and postsynapt</td>
+          <td style="font-size:10px">6.50e-04</td>
+        </tr>
+<tr>
+          <td><strong>AGRN</strong></td>
+          <td>1:1048024</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_001305275.2:c.3764C>T</td>
+          <td style="font-size:10px">NP_001292204.1:p.Ala1255Val</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">Uncertain significance||Uncertain significance</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Myasthenic syndrome, congenital, 8, with pre- and postsynapt</td>
+          <td style="font-size:10px">1.58e-04</td>
+        </tr>
+<tr>
+          <td><strong>AGRN</strong></td>
+          <td>1:1048024</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_001364727.2:c.3449C>T</td>
+          <td style="font-size:10px">NP_001351656.1:p.Ala1150Val</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">Uncertain significance||Uncertain significance</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Myasthenic syndrome, congenital, 8, with pre- and postsynapt</td>
+          <td style="font-size:10px">1.58e-04</td>
+        </tr>
+<tr>
+          <td><strong>AGRN</strong></td>
+          <td>1:1048024</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_198576.4:c.3764C>T</td>
+          <td style="font-size:10px">NP_940978.2:p.Ala1255Val</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">Uncertain significance||Uncertain significance</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Myasthenic syndrome, congenital, 8, with pre- and postsynapt</td>
+          <td style="font-size:10px">1.58e-04</td>
+        </tr>
+<tr>
+          <td><strong>C1orf159</strong></td>
+          <td>1:1090441</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">splice_polypyrimidine_tract_variant,intron_variant</td>
+          <td style="font-size:10px">NM_001330306.2:c.181-13G>A</td>
+          <td style="font-size:10px">NP_001317235.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">9.20e-05</td>
+        </tr>
+<tr>
+          <td><strong>C1orf159</strong></td>
+          <td>1:1090441</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">splice_polypyrimidine_tract_variant,intron_variant</td>
+          <td style="font-size:10px">NM_001363525.2:c.73-13G>A</td>
+          <td style="font-size:10px">NP_001350454.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">9.20e-05</td>
+        </tr>
+<tr>
+          <td><strong>C1orf159</strong></td>
+          <td>1:1090441</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">splice_polypyrimidine_tract_variant,intron_variant</td>
+          <td style="font-size:10px">NM_017891.5:c.73-13G>A</td>
+          <td style="font-size:10px">NP_060361.4:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">9.20e-05</td>
+        </tr>
+<tr>
+          <td><strong>CCNL2</strong></td>
+          <td>1:1399095</td>
+          <td style="font-family:monospace;font-size:11px">G>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_001039577.5:c.212C>G</td>
+          <td style="font-size:10px">NP_001034666.1:p.Thr71Ser</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0219</td>
+        </tr>
+<tr>
+          <td><strong>MRPL20</strong></td>
+          <td>1:1399095</td>
+          <td style="font-family:monospace;font-size:11px">G>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">downstream_gene_variant</td>
+          <td style="font-size:10px">NM_001318485.2:c.*3474G>C</td>
+          <td style="font-size:10px">NP_001305414.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0219</td>
+        </tr>
+<tr>
+          <td><strong>CCNL2</strong></td>
+          <td>1:1399095</td>
+          <td style="font-family:monospace;font-size:11px">G>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">5_prime_UTR_variant</td>
+          <td style="font-size:10px">NM_001320153.3:c.-1179C>G</td>
+          <td style="font-size:10px">NP_001307082.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0219</td>
+        </tr>
+<tr>
+          <td><strong>CCNL2</strong></td>
+          <td>1:1399095</td>
+          <td style="font-family:monospace;font-size:11px">G>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">5_prime_UTR_variant</td>
+          <td style="font-size:10px">NM_001320155.3:c.-469C>G</td>
+          <td style="font-size:10px">NP_001307084.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0219</td>
+        </tr>
+<tr>
+          <td><strong>CCNL2</strong></td>
+          <td>1:1399095</td>
+          <td style="font-family:monospace;font-size:11px">G>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">upstream_gene_variant</td>
+          <td style="font-size:10px">NM_001350497.1:c.-8237G>C</td>
+          <td style="font-size:10px">NP_001337426.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0219</td>
+        </tr>
+<tr>
+          <td><strong>CCNL2</strong></td>
+          <td>1:1399095</td>
+          <td style="font-family:monospace;font-size:11px">G>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">5_prime_UTR_variant</td>
+          <td style="font-size:10px">NM_001350498.2:c.-580C>G</td>
+          <td style="font-size:10px">NP_001337427.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0219</td>
+        </tr>
+<tr>
+          <td><strong>CCNL2</strong></td>
+          <td>1:1399095</td>
+          <td style="font-family:monospace;font-size:11px">G>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">5_prime_UTR_variant</td>
+          <td style="font-size:10px">NM_001350499.2:c.-586C>G</td>
+          <td style="font-size:10px">NP_001337428.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0219</td>
+        </tr>
+<tr>
+          <td><strong>CCNL2</strong></td>
+          <td>1:1399095</td>
+          <td style="font-family:monospace;font-size:11px">G>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">5_prime_UTR_variant</td>
+          <td style="font-size:10px">NM_001350500.2:c.-475C>G</td>
+          <td style="font-size:10px">NP_001337429.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0219</td>
+        </tr>
+<tr>
+          <td><strong>MRPL20</strong></td>
+          <td>1:1399095</td>
+          <td style="font-family:monospace;font-size:11px">G>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">downstream_gene_variant</td>
+          <td style="font-size:10px">NM_017971.4:c.*2988G>C</td>
+          <td style="font-size:10px">NP_060441.2:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0219</td>
+        </tr>
+<tr>
+          <td><strong>CCNL2</strong></td>
+          <td>1:1399095</td>
+          <td style="font-family:monospace;font-size:11px">G>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_030937.6:c.212C>G</td>
+          <td style="font-size:10px">NP_112199.2:p.Thr71Ser</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0219</td>
+        </tr>
+<tr>
+          <td><strong>MRPL20-AS1</strong></td>
+          <td>1:1399095</td>
+          <td style="font-family:monospace;font-size:11px">G>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">upstream_gene_variant</td>
+          <td style="font-size:10px">NR_015434.1:c.?</td>
+          <td style="font-size:10px">-:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0219</td>
+        </tr>
+<tr>
+          <td><strong>CCNL2</strong></td>
+          <td>1:1399095</td>
+          <td style="font-family:monospace;font-size:11px">G>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">non_coding_transcript_exon_variant</td>
+          <td style="font-size:10px">NR_135154.2:n.241C>G</td>
+          <td style="font-size:10px">-:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0219</td>
+        </tr>
+<tr>
+          <td><strong>CCNL2</strong></td>
+          <td>1:1399095</td>
+          <td style="font-family:monospace;font-size:11px">G>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">non_coding_transcript_exon_variant</td>
+          <td style="font-size:10px">NR_146722.2:n.241C>G</td>
+          <td style="font-size:10px">-:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0219</td>
+        </tr>
+<tr>
+          <td><strong>CCNL2</strong></td>
+          <td>1:1399095</td>
+          <td style="font-family:monospace;font-size:11px">G>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">non_coding_transcript_exon_variant</td>
+          <td style="font-size:10px">NR_146723.2:n.241C>G</td>
+          <td style="font-size:10px">-:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0219</td>
+        </tr>
+<tr>
+          <td><strong>ATAD3B</strong></td>
+          <td>1:1495680</td>
+          <td style="font-family:monospace;font-size:11px">T>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_001317238.2:c.1672T>C</td>
+          <td style="font-size:10px">NP_001304167.1:p.Tyr558His</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">ATAD3B-related Neurological Syndrome</td>
+          <td style="font-size:10px">3.14e-04</td>
+        </tr>
+<tr>
+          <td><strong>ATAD3B</strong></td>
+          <td>1:1495680</td>
+          <td style="font-family:monospace;font-size:11px">T>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_031921.6:c.1810T>C</td>
+          <td style="font-size:10px">NP_114127.3:p.Tyr604His</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">ATAD3B-related Neurological Syndrome</td>
+          <td style="font-size:10px">3.14e-04</td>
+        </tr>
+<tr>
+          <td><strong>MMP23B</strong></td>
+          <td>1:1629324</td>
+          <td style="font-family:monospace;font-size:11px">A>ACGG</td>
+          <td>0/1</td>
+          <td style="font-size:11px">upstream_gene_variant</td>
+          <td style="font-size:10px">-</td>
+          <td style="font-size:10px">NP_008914.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0129</td>
+        </tr>
+<tr>
+          <td><strong>MIB2</strong></td>
+          <td>1:1632246</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">downstream_gene_variant</td>
+          <td style="font-size:10px">NM_001170686.4:c.*1716G>A</td>
+          <td style="font-size:10px">NP_001164157.3:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">MIB2-related left ventricle hypertrabeculation/non-compactio</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>MIB2</strong></td>
+          <td>1:1632246</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">downstream_gene_variant</td>
+          <td style="font-size:10px">NM_001170687.4:c.*1716G>A</td>
+          <td style="font-size:10px">NP_001164158.3:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">MIB2-related left ventricle hypertrabeculation/non-compactio</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>MIB2</strong></td>
+          <td>1:1632246</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">downstream_gene_variant</td>
+          <td style="font-size:10px">NM_001170688.2:c.*1716G>A</td>
+          <td style="font-size:10px">NP_001164159.2:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">MIB2-related left ventricle hypertrabeculation/non-compactio</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>MIB2</strong></td>
+          <td>1:1632246</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">downstream_gene_variant</td>
+          <td style="font-size:10px">NM_001170689.2:c.*1945G>A</td>
+          <td style="font-size:10px">NP_001164160.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">MIB2-related left ventricle hypertrabeculation/non-compactio</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>CDK11B</strong></td>
+          <td>1:1632246</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">downstream_gene_variant</td>
+          <td style="font-size:10px">NM_001291345.2:c.*3518G>A</td>
+          <td style="font-size:10px">NP_001278274.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>CDK11B</strong></td>
+          <td>1:1632246</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">downstream_gene_variant</td>
+          <td style="font-size:10px">NM_001787.3:c.*3518G>A</td>
+          <td style="font-size:10px">NP_001778.2:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>MMP23B</strong></td>
+          <td>1:1632246</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_006983.2:c.28G>A</td>
+          <td style="font-size:10px">NP_008914.1:p.Glu10Lys</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>CDK11B</strong></td>
+          <td>1:1632246</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">downstream_gene_variant</td>
+          <td style="font-size:10px">NM_033486.3:c.*3518G>A</td>
+          <td style="font-size:10px">NP_277021.2:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>CDK11B</strong></td>
+          <td>1:1632246</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">downstream_gene_variant</td>
+          <td style="font-size:10px">NM_033487.3:c.*3518G>A</td>
+          <td style="font-size:10px">NP_277022.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>CDK11B</strong></td>
+          <td>1:1632246</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">downstream_gene_variant</td>
+          <td style="font-size:10px">NM_033489.3:c.*3518G>A</td>
+          <td style="font-size:10px">NP_277024.2:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>CDK11B</strong></td>
+          <td>1:1632246</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">downstream_gene_variant</td>
+          <td style="font-size:10px">NM_033490.3:c.*3518G>A</td>
+          <td style="font-size:10px">NP_277025.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>MIB2</strong></td>
+          <td>1:1632246</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">downstream_gene_variant</td>
+          <td style="font-size:10px">NM_080875.5:c.*1716G>A</td>
+          <td style="font-size:10px">NP_543151.4:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">MIB2-related left ventricle hypertrabeculation/non-compactio</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>MIB2</strong></td>
+          <td>1:1632246</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">downstream_gene_variant</td>
+          <td style="font-size:10px">NR_033183.2:c.?</td>
+          <td style="font-size:10px">-:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">MIB2-related left ventricle hypertrabeculation/non-compactio</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>SLC35E2B</strong></td>
+          <td>1:1668501</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_001110781.3:c.835-29G>A</td>
+          <td style="font-size:10px">NP_001104251.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0072</td>
+        </tr>
+<tr>
+          <td><strong>SLC35E2B</strong></td>
+          <td>1:1668501</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_001290264.2:c.835-29G>A</td>
+          <td style="font-size:10px">NP_001277193.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0072</td>
+        </tr>
+<tr>
+          <td><strong>SLC35E2B</strong></td>
+          <td>1:1668535</td>
+          <td style="font-family:monospace;font-size:11px">A>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_001110781.3:c.835-63T>G</td>
+          <td style="font-size:10px">NP_001104251.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0061</td>
+        </tr>
+<tr>
+          <td><strong>SLC35E2B</strong></td>
+          <td>1:1668535</td>
+          <td style="font-family:monospace;font-size:11px">A>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_001290264.2:c.835-63T>G</td>
+          <td style="font-size:10px">NP_001277193.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0061</td>
+        </tr>
+<tr>
+          <td><strong>NADK</strong></td>
+          <td>1:1756508</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_001198993.2:c.494G>A</td>
+          <td style="font-size:10px">NP_001185922.1:p.Arg165Gln</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">Uncertain significance</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">NADK-related Mitochondrial NAD kinase deficiency</td>
+          <td style="font-size:10px">1.31e-05</td>
+        </tr>
+<tr>
+          <td><strong>NADK</strong></td>
+          <td>1:1756508</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_001198994.2:c.929G>A</td>
+          <td style="font-size:10px">NP_001185923.1:p.Arg310Gln</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">Uncertain significance</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">NADK-related Mitochondrial NAD kinase deficiency</td>
+          <td style="font-size:10px">1.31e-05</td>
+        </tr>
+<tr>
+          <td><strong>NADK</strong></td>
+          <td>1:1756508</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_001198995.1:c.398G>A</td>
+          <td style="font-size:10px">NP_001185924.1:p.Arg133Gln</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">Uncertain significance</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">NADK-related Mitochondrial NAD kinase deficiency</td>
+          <td style="font-size:10px">1.31e-05</td>
+        </tr>
+<tr>
+          <td><strong>NADK</strong></td>
+          <td>1:1756508</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_001353641.2:c.494G>A</td>
+          <td style="font-size:10px">NP_001340570.1:p.Arg165Gln</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">Uncertain significance</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">NADK-related Mitochondrial NAD kinase deficiency</td>
+          <td style="font-size:10px">1.31e-05</td>
+        </tr>
+<tr>
+          <td><strong>NADK</strong></td>
+          <td>1:1756508</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_001353642.2:c.233G>A</td>
+          <td style="font-size:10px">NP_001340571.1:p.Arg78Gln</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">Uncertain significance</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">NADK-related Mitochondrial NAD kinase deficiency</td>
+          <td style="font-size:10px">1.31e-05</td>
+        </tr>
+<tr>
+          <td><strong>NADK</strong></td>
+          <td>1:1756508</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_023018.5:c.494G>A</td>
+          <td style="font-size:10px">NP_075394.3:p.Arg165Gln</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">Uncertain significance</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">NADK-related Mitochondrial NAD kinase deficiency</td>
+          <td style="font-size:10px">1.31e-05</td>
+        </tr>
+<tr>
+          <td><strong>NADK</strong></td>
+          <td>1:1759737</td>
+          <td style="font-family:monospace;font-size:11px">T>G</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_001198993.2:c.263+2215A>C</td>
+          <td style="font-size:10px">NP_001185922.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">NADK-related Mitochondrial NAD kinase deficiency</td>
+          <td style="font-size:10px">0.0078</td>
+        </tr>
+<tr>
+          <td><strong>NADK</strong></td>
+          <td>1:1759737</td>
+          <td style="font-family:monospace;font-size:11px">T>G</td>
+          <td>0/1</td>
+          <td style="font-size:11px">upstream_gene_variant</td>
+          <td style="font-size:10px">NM_001198995.1:c.-1206T>G</td>
+          <td style="font-size:10px">NP_001185924.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">NADK-related Mitochondrial NAD kinase deficiency</td>
+          <td style="font-size:10px">0.0078</td>
+        </tr>
+<tr>
+          <td><strong>NADK</strong></td>
+          <td>1:1759737</td>
+          <td style="font-family:monospace;font-size:11px">T>G</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_001353641.2:c.263+2215A>C</td>
+          <td style="font-size:10px">NP_001340570.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">NADK-related Mitochondrial NAD kinase deficiency</td>
+          <td style="font-size:10px">0.0078</td>
+        </tr>
+<tr>
+          <td><strong>NADK</strong></td>
+          <td>1:1759737</td>
+          <td style="font-family:monospace;font-size:11px">T>G</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_001353642.2:c.2+2154A>C</td>
+          <td style="font-size:10px">NP_001340571.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">NADK-related Mitochondrial NAD kinase deficiency</td>
+          <td style="font-size:10px">0.0078</td>
+        </tr>
+<tr>
+          <td><strong>CFAP74</strong></td>
+          <td>1:1926157</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_001304360.2:c.3948+71C>T</td>
+          <td style="font-size:10px">NP_001291289.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Ciliary dyskinesia, primary, 49, without situs inversus</td>
+          <td style="font-size:10px">9.20e-05</td>
+        </tr>
+<tr>
+          <td><strong>PLCH2</strong></td>
+          <td>1:2494809</td>
+          <td style="font-family:monospace;font-size:11px">G>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_001303012.2:c.1579-47G>C</td>
+          <td style="font-size:10px">NP_001289941.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0215</td>
+        </tr>
+<tr>
+          <td><strong>PLCH2</strong></td>
+          <td>1:2494809</td>
+          <td style="font-family:monospace;font-size:11px">G>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_001303013.1:c.1720-47G>C</td>
+          <td style="font-size:10px">NP_001289942.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0215</td>
+        </tr>
+<tr>
+          <td><strong>PLCH2</strong></td>
+          <td>1:2494809</td>
+          <td style="font-family:monospace;font-size:11px">G>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_014638.4:c.1660-47G>C</td>
+          <td style="font-size:10px">NP_055453.2:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0215</td>
+        </tr>
+<tr>
+          <td><strong>PLCH2</strong></td>
+          <td>1:2504299</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">3_prime_UTR_variant</td>
+          <td style="font-size:10px">NM_001303012.2:c.*672G>A</td>
+          <td style="font-size:10px">NP_001289941.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0242</td>
+        </tr>
+<tr>
+          <td><strong>PLCH2</strong></td>
+          <td>1:2504299</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">3_prime_UTR_variant</td>
+          <td style="font-size:10px">NM_001303013.1:c.*314G>A</td>
+          <td style="font-size:10px">NP_001289942.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0242</td>
+        </tr>
+<tr>
+          <td><strong>PLCH2</strong></td>
+          <td>1:2504299</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_014638.4:c.3337G>A</td>
+          <td style="font-size:10px">NP_055453.2:p.Ala1113Thr</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0242</td>
+        </tr>
+<tr>
+          <td><strong>PLCH2</strong></td>
+          <td>1:2504457</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">3_prime_UTR_variant</td>
+          <td style="font-size:10px">NM_001303012.2:c.*830G>A</td>
+          <td style="font-size:10px">NP_001289941.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>PLCH2</strong></td>
+          <td>1:2504457</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">3_prime_UTR_variant</td>
+          <td style="font-size:10px">NM_001303013.1:c.*472G>A</td>
+          <td style="font-size:10px">NP_001289942.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>PLCH2</strong></td>
+          <td>1:2504457</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">synonymous_variant</td>
+          <td style="font-size:10px">NM_014638.4:c.3495G>A</td>
+          <td style="font-size:10px">NP_055453.2:p.Leu1165=</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>PANK4</strong></td>
+          <td>1:2504457</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">downstream_gene_variant</td>
+          <td style="font-size:10px">NM_018216.4:c.*4390G>A</td>
+          <td style="font-size:10px">NP_060686.3:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Cataract 49</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>PLCH2</strong></td>
+          <td>1:2504864</td>
+          <td style="font-family:monospace;font-size:11px">A>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">3_prime_UTR_variant</td>
+          <td style="font-size:10px">NM_001303012.2:c.*1237A>C</td>
+          <td style="font-size:10px">NP_001289941.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0222</td>
+        </tr>
+<tr>
+          <td><strong>PLCH2</strong></td>
+          <td>1:2504864</td>
+          <td style="font-family:monospace;font-size:11px">A>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">3_prime_UTR_variant</td>
+          <td style="font-size:10px">NM_001303013.1:c.*879A>C</td>
+          <td style="font-size:10px">NP_001289942.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0222</td>
+        </tr>
+<tr>
+          <td><strong>PLCH2</strong></td>
+          <td>1:2504864</td>
+          <td style="font-family:monospace;font-size:11px">A>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_014638.4:c.3902A>C</td>
+          <td style="font-size:10px">NP_055453.2:p.Glu1301Ala</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0222</td>
+        </tr>
+<tr>
+          <td><strong>ARHGEF16</strong></td>
+          <td>1:3463266</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_014448.4:c.182G>A</td>
+          <td style="font-size:10px">NP_055263.2:p.Arg61Gln</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0077</td>
+        </tr>
+<tr>
+          <td><strong>ARHGEF16</strong></td>
+          <td>1:3469388</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_014448.4:c.862-45C>T</td>
+          <td style="font-size:10px">NP_055263.2:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">6.57e-04</td>
+        </tr>
+<tr>
+          <td><strong>MEGF6</strong></td>
+          <td>1:3500647</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_001409.4:c.2693C>T</td>
+          <td style="font-size:10px">NP_001400.3:p.Pro898Leu</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0271</td>
+        </tr>
+<tr>
+          <td><strong>MEGF6</strong></td>
+          <td>1:3500647</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_001410718.1:c.2378C>T</td>
+          <td style="font-size:10px">NP_001397647.1:p.Pro793Leu</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0271</td>
+        </tr>
+<tr>
+          <td><strong>WRAP73</strong></td>
+          <td>1:3627631</td>
+          <td style="font-family:monospace;font-size:11px">A>G</td>
+          <td>0/1</td>
+          <td style="font-size:11px">downstream_gene_variant</td>
+          <td style="font-size:10px">NM_017818.4:c.*3344A>G</td>
+          <td style="font-size:10px">NP_060288.3:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>TPRG1L</strong></td>
+          <td>1:3627631</td>
+          <td style="font-family:monospace;font-size:11px">A>G</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_182752.4:c.602A>G</td>
+          <td style="font-size:10px">NP_877429.2:p.Glu201Gly</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>CEP104</strong></td>
+          <td>1:3848531</td>
+          <td style="font-family:monospace;font-size:11px">CA>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_014704.4:c.287+76del</td>
+          <td style="font-size:10px">NP_055519.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Intellectual developmental disorder, autosomal recessive 77</td>
+          <td style="font-size:10px">0.0017</td>
+        </tr>
+<tr>
+          <td><strong>CEP104</strong></td>
+          <td>1:3848531</td>
+          <td style="font-family:monospace;font-size:11px">CA>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_014704.4:c.287+76del</td>
+          <td style="font-size:10px">NP_055519.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Joubert syndrome 25</td>
+          <td style="font-size:10px">0.0017</td>
+        </tr>
+<tr>
+          <td><strong>C1orf174</strong></td>
+          <td>1:3890816</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0|1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_207356.3:c.371G>A</td>
+          <td style="font-size:10px">NP_997239.2:p.Cys124Tyr</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">1.31e-05</td>
+        </tr>
+<tr>
+          <td><strong>NPHP4</strong></td>
+          <td>1:5874890</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_001291593.2:c.1489G>A</td>
+          <td style="font-size:10px">NP_001278522.1:p.Asp497Asn</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">Uncertain significance||Likely benign||Likely benign</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Senior-Loken syndrome 4</td>
+          <td style="font-size:10px">1.58e-04</td>
+        </tr>
+<tr>
+          <td><strong>NPHP4</strong></td>
+          <td>1:5874890</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_001291593.2:c.1489G>A</td>
+          <td style="font-size:10px">NP_001278522.1:p.Asp497Asn</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">Uncertain significance||Likely benign||Likely benign</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Nephronophthisis 4</td>
+          <td style="font-size:10px">1.58e-04</td>
+        </tr>
+<tr>
+          <td><strong>NPHP4</strong></td>
+          <td>1:5874890</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_001291594.2:c.1492G>A</td>
+          <td style="font-size:10px">NP_001278523.1:p.Asp498Asn</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">Uncertain significance||Likely benign||Likely benign</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Senior-Loken syndrome 4</td>
+          <td style="font-size:10px">1.58e-04</td>
+        </tr>
+<tr>
+          <td><strong>NPHP4</strong></td>
+          <td>1:5874890</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_001291594.2:c.1492G>A</td>
+          <td style="font-size:10px">NP_001278523.1:p.Asp498Asn</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">Uncertain significance||Likely benign||Likely benign</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Nephronophthisis 4</td>
+          <td style="font-size:10px">1.58e-04</td>
+        </tr>
+<tr>
+          <td><strong>NPHP4</strong></td>
+          <td>1:5874890</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_015102.5:c.3028G>A</td>
+          <td style="font-size:10px">NP_055917.1:p.Asp1010Asn</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">Uncertain significance||Likely benign||Likely benign</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Senior-Loken syndrome 4</td>
+          <td style="font-size:10px">1.58e-04</td>
+        </tr>
+<tr>
+          <td><strong>NPHP4</strong></td>
+          <td>1:5874890</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_015102.5:c.3028G>A</td>
+          <td style="font-size:10px">NP_055917.1:p.Asp1010Asn</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">Uncertain significance||Likely benign||Likely benign</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Nephronophthisis 4</td>
+          <td style="font-size:10px">1.58e-04</td>
+        </tr>
+<tr>
+          <td><strong>NPHP4</strong></td>
+          <td>1:5874890</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">non_coding_transcript_exon_variant</td>
+          <td style="font-size:10px">NR_111987.2:n.3795G>A</td>
+          <td style="font-size:10px">-:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">Uncertain significance||Likely benign||Likely benign</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Senior-Loken syndrome 4</td>
+          <td style="font-size:10px">1.58e-04</td>
+        </tr>
+<tr>
+          <td><strong>NPHP4</strong></td>
+          <td>1:5874890</td>
+          <td style="font-family:monospace;font-size:11px">C>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">non_coding_transcript_exon_variant</td>
+          <td style="font-size:10px">NR_111987.2:n.3795G>A</td>
+          <td style="font-size:10px">-:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">Uncertain significance||Likely benign||Likely benign</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">Nephronophthisis 4</td>
+          <td style="font-size:10px">1.58e-04</td>
+        </tr>
+<tr>
+          <td><strong>HES3</strong></td>
+          <td>1:6244682</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_001024598.4:c.163+53G>A</td>
+          <td style="font-size:10px">NP_001019769.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>GPR153</strong></td>
+          <td>1:6244682</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">downstream_gene_variant</td>
+          <td style="font-size:10px">NM_207370.4:c.*4656G>A</td>
+          <td style="font-size:10px">NP_997253.2:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>HES3</strong></td>
+          <td>1:6250374</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">downstream_gene_variant</td>
+          <td style="font-size:10px">NM_001024598.4:c.*4867G>A</td>
+          <td style="font-size:10px">NP_001019769.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>GPR153</strong></td>
+          <td>1:6250374</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_207370.4:c.1164+66C>T</td>
+          <td style="font-size:10px">NP_997253.2:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">-</td>
+        </tr>
+<tr>
+          <td><strong>DNAJC11</strong></td>
+          <td>1:6701854</td>
+          <td style="font-family:monospace;font-size:11px">G>A</td>
+          <td>0/1</td>
+          <td style="font-size:11px">upstream_gene_variant</td>
+          <td style="font-size:10px">NM_018198.4:c.-54G>A</td>
+          <td style="font-size:10px">NP_060668.2:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">DNAJC11-related autosomal recessive neuromuscular disease</td>
+          <td style="font-size:10px">0.0011</td>
+        </tr>
+<tr>
+          <td><strong>ENO1</strong></td>
+          <td>1:8866374</td>
+          <td style="font-family:monospace;font-size:11px">T>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_001201483.4:c.293A>G</td>
+          <td style="font-size:10px">NP_001188412.1:p.Asn98Ser</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">ENO1-related polymicrogyria</td>
+          <td style="font-size:10px">3.94e-05</td>
+        </tr>
+<tr>
+          <td><strong>ENO1</strong></td>
+          <td>1:8866374</td>
+          <td style="font-family:monospace;font-size:11px">T>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_001353346.3:c.572A>G</td>
+          <td style="font-size:10px">NP_001340275.1:p.Asn191Ser</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">ENO1-related polymicrogyria</td>
+          <td style="font-size:10px">3.94e-05</td>
+        </tr>
+<tr>
+          <td><strong>ENO1</strong></td>
+          <td>1:8866374</td>
+          <td style="font-family:monospace;font-size:11px">T>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">missense_variant</td>
+          <td style="font-size:10px">NM_001428.5:c.572A>G</td>
+          <td style="font-size:10px">NP_001419.1:p.Asn191Ser</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">ENO1-related polymicrogyria</td>
+          <td style="font-size:10px">3.94e-05</td>
+        </tr>
+<tr>
+          <td><strong>MIR6728</strong></td>
+          <td>1:8866374</td>
+          <td style="font-family:monospace;font-size:11px">T>C</td>
+          <td>0/1</td>
+          <td style="font-size:11px">downstream_gene_variant</td>
+          <td style="font-size:10px">NR_106786.1:c.?</td>
+          <td style="font-size:10px">-:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">3.94e-05</td>
+        </tr>
+<tr>
+          <td><strong>MIR6728</strong></td>
+          <td>1:8870547</td>
+          <td style="font-family:monospace;font-size:11px">C>G</td>
+          <td>0/1</td>
+          <td style="font-size:11px">upstream_gene_variant</td>
+          <td style="font-size:10px">NR_106786.1:c.?</td>
+          <td style="font-size:10px">-:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0188</td>
+        </tr>
+<tr>
+          <td><strong>SRM</strong></td>
+          <td>1:11055112</td>
+          <td style="font-family:monospace;font-size:11px">G>T</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_003132.3:c.766-28C>A</td>
+          <td style="font-size:10px">NP_003123.2:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0093</td>
+        </tr>
+<tr>
+          <td><strong>EXOSC10</strong></td>
+          <td>1:11074413</td>
+          <td style="font-family:monospace;font-size:11px">A>AT</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_001001998.3:c.1987-88dup</td>
+          <td style="font-size:10px">NP_001001998.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0056</td>
+        </tr>
+<tr>
+          <td><strong>EXOSC10</strong></td>
+          <td>1:11074413</td>
+          <td style="font-family:monospace;font-size:11px">A>AT</td>
+          <td>0/1</td>
+          <td style="font-size:11px">intron_variant</td>
+          <td style="font-size:10px">NM_002685.4:c.1987-88dup</td>
+          <td style="font-size:10px">NP_002676.1:p.?</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style="font-size:11px">-</td>
+          <td style="font-size:10px;max-width:160px;overflow:hidden">-</td>
+          <td style="font-size:10px">0.0056</td>
+        </tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CNV Table -->
+  <div class="section">
+    <h2>🧩 Copy Number Variants – CNV (5)</h2>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Chr</th><th>Coordinates</th><th>Type</th><th>Genes</th>
+          <th>ACMG</th><th>gnomAD Freq</th><th>Cytoband</th>
+        </tr></thead>
+        <tbody><tr>
+          <td>1</td>
+          <td>54597259–54680045</td>
+          <td>DUP</td>
+          <td>ACOT11|||FAM151A|||MROH7</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style='font-size:10px'>9.2e-05</td>
+          <td style='font-size:10px'>1p32.3</td>
+        </tr><tr>
+          <td>20</td>
+          <td>25282033–25284251</td>
+          <td>DUP</td>
+          <td>PYGB</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style='font-size:10px'>0.000184</td>
+          <td style='font-size:10px'>20p11.21</td>
+        </tr><tr>
+          <td>20</td>
+          <td>64227415–64273600</td>
+          <td>DUP</td>
+          <td>MYT1|||PCMTD2</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style='font-size:10px'>-</td>
+          <td style='font-size:10px'>20q13.33</td>
+        </tr><tr>
+          <td>5</td>
+          <td>32107969–32135686</td>
+          <td>DUP</td>
+          <td>PDZD2|||GOLPH3</td>
+          <td><span style="background:#FFF9C4;color:#F57F17;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #F57F1740">Vus</span></td>
+          <td style='font-size:10px'>0.017823</td>
+          <td style='font-size:10px'>5p13.3</td>
+        </tr><tr>
+          <td>7</td>
+          <td>64069514–64314153</td>
+          <td>DUP</td>
+          <td>ZNF727|||ZNF735|||ZNF679|||ZNF736</td>
+          <td><span style="background:#FFE0B2;color:#E64A19;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid #E64A1940">Likely Pathogenic</span></td>
+          <td style='font-size:10px'>0.000138</td>
+          <td style='font-size:10px'>7q11.21</td>
+        </tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pipeline Description -->
+  <div class="section">
+    <h2>🔬 Pipeline Description</h2>
+    <table>
+      <thead><tr><th>Step</th><th>Tool / Version</th><th>Input</th><th>Output</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><strong>1. QC</strong></td><td>fastp / FastQC</td><td>FASTQ (paired)</td><td>Cleaned FASTQ, HTML report</td><td>Adapter trimming, Q30 filter</td></tr>
+        <tr><td><strong>2. Alignment</strong></td><td>BWA-MEM</td><td>Cleaned FASTQ</td><td>BAM + index</td><td>GRCh38.NGSdeadzone_masked reference</td></tr>
+        <tr><td><strong>3. Variant Calling</strong></td><td>GATK 4.4.0 HaplotypeCaller + GenotypeGVCFs</td><td>BAM</td><td>Raw VCF (per-chr)</td><td>Germline mode, VQSR filtering</td></tr>
+        <tr><td><strong>4. Filtration</strong></td><td>GATK VQSR + hard filters</td><td>Raw VCF</td><td>Filtered VCF</td><td>SNP_FILTER, INDEL_FILTER, STRAND_BIAS_FILTER</td></tr>
+        <tr><td><strong>5. Annotation</strong></td><td>VEP + ClinVar + gnomAD v3</td><td>Filtered VCF</td><td>Annotated XLSX</td><td>ACMG classification, disease phenotypes</td></tr>
+        <tr><td><strong>6. CNV</strong></td><td>CNV caller (lab internal)</td><td>BAM</td><td>CNV XLSX</td><td>IDT 3B v2 panel-matched</td></tr>
+        <tr><td><strong>7. Report</strong></td><td>Python (pandas, matplotlib)</td><td>XLSX, VCF</td><td>HTML report</td><td>This document</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+<footer>
+  Sample: EPJ25-LCRJ &nbsp;·&nbsp; Big Data / Genomics Assignment &nbsp;·&nbsp; Maratov Yerassyl Balkanovich &nbsp;·&nbsp; April 20, 2026<br>
+  <em>This report is for academic purposes only. All variant classifications should be confirmed by a certified clinical geneticist.</em>
+</footer>
+</body>
+</html>

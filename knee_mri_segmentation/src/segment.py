@@ -62,6 +62,65 @@ def segment_otsu_morphology(img: np.ndarray) -> np.ndarray:
     return seg
 
 
+def segment_improved(img: np.ndarray, return_steps: bool = False):
+    """
+    Improved double-Otsu segmentation:
+      1. Normalize → Otsu threshold → tissue vs background
+      2. Second Otsu WITHIN tissue → bone (medium) vs cartilage (bright)
+      3. Morphological refinement
+
+    Returns:
+      - ndarray (0=bg, 1=bone, 2=cartilage) when return_steps=False
+      - (ndarray, steps_dict) when return_steps=True
+        steps_dict keys: "normalized", "tissue_binary", "bone_cart_raw", "t1", "t2"
+    """
+    img_norm = cv2.normalize(img, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+
+    # Step 1: Otsu — tissue vs background
+    t1, binary = cv2.threshold(img_norm, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    # Step 2: Second Otsu within tissue pixels only
+    fg_pixels = img_norm[binary > 0]
+    if len(fg_pixels) > 100:
+        t2, _ = cv2.threshold(fg_pixels, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    else:
+        t2 = int(t1) + 20
+
+    # Assign classes: bone = medium tissue, cartilage = bright tissue
+    bone_raw = ((binary > 0) & (img_norm < int(t2))).astype(np.uint8)
+    cart_raw = ((binary > 0) & (img_norm >= int(t2))).astype(np.uint8)
+
+    # Step 3: Morphological refinement
+    k5 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+    k3 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+
+    bone = cv2.morphologyEx(bone_raw, cv2.MORPH_CLOSE, k5)
+    bone = cv2.morphologyEx(bone, cv2.MORPH_OPEN, k3)
+
+    cart = cv2.morphologyEx(cart_raw, cv2.MORPH_CLOSE, k3)
+    cart[bone == 1] = 0  # cartilage cannot overlap bone
+
+    result = np.zeros(img.shape, dtype=np.uint8)
+    result[bone == 1] = 1
+    result[cart == 1] = 2
+
+    if not return_steps:
+        return result
+
+    raw_vis = np.zeros_like(img_norm)
+    raw_vis[bone_raw == 1] = 128   # bone raw → gray
+    raw_vis[cart_raw == 1] = 255   # cartilage raw → white
+
+    steps = {
+        "normalized":     img_norm,
+        "tissue_binary":  binary,
+        "bone_cart_raw":  raw_vis,
+        "t1": int(t1),
+        "t2": int(t2),
+    }
+    return result, steps
+
+
 def evaluate_dataset(meta: pd.DataFrame, split: str = "test", num_classes: int = 5) -> dict:
     """
     Run baseline segmentation and compute metrics against ground truth.

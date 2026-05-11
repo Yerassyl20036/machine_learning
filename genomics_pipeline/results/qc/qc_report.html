@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>QC Report – EPJ25-LCRJ</title>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #f5f7fa; color: #222; }
+  .header { background: linear-gradient(135deg,#1565C0,#42A5F5); color: white; padding: 30px 40px; }
+  .header h1 { margin: 0; font-size: 28px; }
+  .header p { margin: 6px 0 0; opacity: 0.85; font-size: 14px; }
+  .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
+  .cards { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 30px; }
+  .card { background: white; border-radius: 10px; padding: 20px 24px; flex: 1; min-width: 180px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-top: 4px solid #1565C0; }
+  .card .val { font-size: 28px; font-weight: 700; color: #1565C0; }
+  .card .lbl { font-size: 12px; color: #777; margin-top: 4px; }
+  .section { background: white; border-radius: 10px; padding: 24px; margin-bottom: 24px;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  .section h2 { margin-top: 0; color: #1565C0; border-bottom: 2px solid #e3f2fd; padding-bottom: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: #e3f2fd; color: #1565C0; padding: 10px 14px; text-align: left; }
+  td { padding: 8px 14px; border-bottom: 1px solid #f0f0f0; }
+  tr:hover td { background: #fafafa; }
+  .figures { display: flex; gap: 16px; flex-wrap: wrap; }
+  .fig-box { flex: 1; min-width: 280px; text-align: center; }
+  .fig-box img { width: 100%; border-radius: 8px; box-shadow: 0 1px 6px rgba(0,0,0,0.1); }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 11px;
+            font-weight: 600; background: #e8f5e9; color: #2e7d32; }
+  footer { text-align: center; color: #aaa; font-size: 12px; padding: 20px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>QC Report — EPJ25-LCRJ</h1>
+  <p>Whole Exome Sequencing · GRCh38 · IDT 3B v2 Kit · Generated 2026-04-20</p>
+</div>
+<div class="container">
+  <div class="cards">
+    <div class="card"><div class="val">201.41×</div><div class="lbl">Mean Depth</div></div>
+    <div class="card"><div class="val">98.58%</div><div class="lbl">Q30</div></div>
+    <div class="card"><div class="val">64,157</div><div class="lbl">SNPs called</div></div>
+    <div class="card"><div class="val">12,108</div><div class="lbl">INDELs called</div></div>
+    <div class="card"><div class="val">2.42</div><div class="lbl">Ts/Tv Ratio</div></div>
+    <div class="card"><div class="val">1.74</div><div class="lbl">Het/Hom Ratio</div></div>
+  </div>
+
+  <div class="section">
+    <h2>📊 Quality Figures</h2>
+    <div class="figures">
+      <div class="fig-box">
+        <img src="../figures/qc_quality_bars.png" alt="Quality Metrics">
+        <p>Sequencing Quality Metrics</p>
+      </div>
+      <div class="fig-box">
+        <img src="../figures/qc_coverage_profile.png" alt="Coverage Profile">
+        <p>Coverage Profile</p>
+      </div>
+      <div class="fig-box">
+        <img src="../figures/qc_variant_composition.png" alt="Variant Composition">
+        <p>Variant Composition</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>📋 Full Statistics Table</h2>
+    <table>
+      <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+      <tbody><tr><td>Sample Id</td><td><strong>EPJ25-LCRJ</strong></td></tr><tr><td>Reference</td><td><strong>grch38</strong></td></tr><tr><td>Kit</td><td><strong>idt_3b_v2</strong></td></tr><tr><td>Target Region</td><td><strong>35392153</strong></td></tr><tr><td>Total Yield (bp)</td><td><strong>12483539123</strong></td></tr><tr><td>Q20 (%)</td><td><strong>99.79</strong></td></tr><tr><td>Q30 (%)</td><td><strong>98.58</strong></td></tr><tr><td>Initial Mappable Reads (%)</td><td><strong>99.76</strong></td></tr><tr><td>Non Redundant Reads (%)</td><td><strong>89.37</strong></td></tr><tr><td>On-Target Reads (%)</td><td><strong>102.79</strong></td></tr><tr><td>Mean Depth (x)</td><td><strong>201.41</strong></td></tr><tr><td>1X Coverage (%)</td><td><strong>99.7</strong></td></tr><tr><td>2X Coverage (%)</td><td><strong>99.6</strong></td></tr><tr><td>5X Coverage (%)</td><td><strong>99.4</strong></td></tr><tr><td>10X Coverage (%)</td><td><strong>99.2</strong></td></tr><tr><td>20X Coverage (%)</td><td><strong>98.7</strong></td></tr><tr><td>30X Coverage (%)</td><td><strong>98.2</strong></td></tr><tr><td>40X Coverage (%)</td><td><strong>97.7</strong></td></tr><tr><td>50X Coverage (%)</td><td><strong>96.9</strong></td></tr><tr><td>SNP</td><td><strong>64157</strong></td></tr><tr><td>INDEL</td><td><strong>12108</strong></td></tr><tr><td>TsTv</td><td><strong>2.42</strong></td></tr><tr><td>Het/Hom</td><td><strong>1.74</strong></td></tr></tbody>
+    </table>
+  </div>
+</div>
+<footer>EPJ25-LCRJ · Big Data / Genomics Assignment · Maratov Yerassyl · 2026</footer>
+</body>
+</html>

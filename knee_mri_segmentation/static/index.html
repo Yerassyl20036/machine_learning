@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Сегментация МРТ коленного сустава</title>
+  <style>
+    :root {
+      --bg:     #0e1a2b;
+      --card:   #122238;
+      --dark:   #1c334d;
+      --blue:   #0099ff;
+      --green:  #00cc99;
+      --orange: #ff9900;
+      --white:  #ffffff;
+      --lgray:  #ccddee;
+      --dgray:  #7799bb;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--card);
+      border-bottom: 3px solid var(--blue);
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    header .dot { width: 10px; height: 40px; background: var(--blue); border-radius: 3px; }
+    header h1 { font-size: 1.3rem; font-weight: 700; line-height: 1.3; }
+    header p  { font-size: 0.82rem; color: var(--blue); margin-top: 2px; }
+
+    /* ── Main layout ── */
+    main {
+      max-width: 1200px;
+      margin: 32px auto;
+      padding: 0 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* ── Upload zone ── */
+    .upload-zone {
+      background: var(--card);
+      border: 2px dashed var(--blue);
+      border-radius: 12px;
+      padding: 40px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+    }
+    .upload-zone:hover, .upload-zone.drag { border-color: var(--green); background: var(--dark); }
+    .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .upload-zone .icon { font-size: 3rem; margin-bottom: 10px; }
+    .upload-zone .hint { color: var(--dgray); font-size: 0.88rem; margin-top: 8px; }
+
+    /* ── Button ── */
+    button#run-btn {
+      background: var(--blue);
+      color: var(--bg);
+      border: none;
+      border-radius: 8px;
+      padding: 14px 36px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      width: 100%;
+    }
+    button#run-btn:hover { background: var(--green); }
+    button#run-btn:disabled { background: var(--dgray); cursor: default; }
+
+    /* ── Results grid ── */
+    .results { display: none; flex-direction: column; gap: 24px; }
+    .results.visible { display: flex; }
+
+    .image-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 700px) { .image-row { grid-template-columns: 1fr; } }
+
+    .img-card {
+      background: var(--card);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .img-card h3 {
+      font-size: 0.95rem;
+      color: var(--lgray);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .img-card img {
+      max-width: 100%;
+      border-radius: 6px;
+      border: 2px solid var(--dark);
+    }
+
+    /* ── Stats bar ── */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 700px) { .stats-bar { grid-template-columns: 1fr 1fr; } }
+
+    .stat-card {
+      background: var(--card);
+      border-radius: 10px;
+      padding: 18px 16px;
+      text-align: center;
+      border-top: 3px solid var(--blue);
+    }
+    .stat-card.green { border-top-color: var(--green); }
+    .stat-card.orange { border-top-color: var(--orange); }
+    .stat-card.dgray { border-top-color: var(--dgray); }
+    .stat-card .val { font-size: 2rem; font-weight: 700; color: var(--white); }
+    .stat-card .lbl { font-size: 0.78rem; color: var(--dgray); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* ── Legend ── */
+    .legend {
+      background: var(--card);
+      border-radius: 10px;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
+    .legend-dot { width: 18px; height: 18px; border-radius: 4px; }
+
+    /* ── Spinner ── */
+    #spinner {
+      display: none;
+      text-align: center;
+      padding: 24px;
+      color: var(--dgray);
+      font-size: 1rem;
+    }
+    #spinner.visible { display: block; }
+    .spin {
+      display: inline-block;
+      width: 32px; height: 32px;
+      border: 4px solid var(--dark);
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Error ── */
+    #error-msg {
+      display: none;
+      background: #3a0a0a;
+      border: 1px solid #ff4455;
+      color: #ff8899;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 0.9rem;
+    }
+    #error-msg.visible { display: block; }
+
+    /* ── Samples ── */
+    .samples-section { background: var(--card); border-radius: 12px; padding: 18px 20px; }
+    .samples-section .sec-title { font-size: 0.82rem; font-weight: 700; color: var(--dgray); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 12px; }
+    .samples-grid { display: flex; gap: 12px; flex-wrap: wrap; }
+    .sample-thumb {
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+      cursor: pointer; border-radius: 8px; padding: 6px;
+      border: 2px solid transparent; transition: border-color 0.2s, background 0.2s;
+    }
+    .sample-thumb:hover { border-color: var(--blue); background: var(--dark); }
+    .sample-thumb.active { border-color: var(--green); background: var(--dark); }
+    .sample-thumb img { width: 90px; height: 90px; object-fit: cover; border-radius: 5px; display: block; }
+    .sample-thumb .kl-badge {
+      font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 99px;
+      color: var(--bg);
+    }
+    .sample-thumb .kl-name { font-size: 0.68rem; color: var(--dgray); }
+
+    /* ── Pipeline steps ── */
+    .steps-section { display: none; flex-direction: column; gap: 10px; }
+    .steps-section.visible { display: flex; }
+    .steps-section .sec-title { font-size: 0.82rem; font-weight: 700; color: var(--dgray); text-transform: uppercase; letter-spacing: 0.07em; }
+    .steps-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+    @media (max-width: 700px) { .steps-grid { grid-template-columns: 1fr 1fr; } }
+    .step-card { background: var(--card); border-radius: 10px; padding: 10px; text-align: center; border-top: 3px solid var(--dgray); }
+    .step-card.s1 { border-top-color: var(--dgray); }
+    .step-card.s2 { border-top-color: var(--orange); }
+    .step-card.s3 { border-top-color: var(--blue); }
+    .step-card.s4 { border-top-color: var(--green); }
+    .step-card img { width: 100%; border-radius: 5px; display: block; margin-bottom: 6px; }
+    .step-card .step-num { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
+    .step-card .step-desc { font-size: 0.72rem; color: var(--dgray); line-height: 1.4; }
+    .step-card .step-val { font-size: 0.7rem; color: var(--orange); margin-top: 4px; font-family: monospace; }
+
+    /* ── Comparison ── */
+    .comparison-section { background: var(--card); border-radius: 12px; padding: 22px 24px; }
+    .comparison-section h2 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+    .comparison-section .sub { font-size: 0.82rem; color: var(--dgray); margin-bottom: 18px; }
+    .method-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+    @media (max-width: 700px) { .method-cards { grid-template-columns: 1fr; } }
+    .method-card { background: var(--dark); border-radius: 10px; padding: 18px 16px; border-top: 4px solid var(--blue); }
+    .method-card.unet { border-top-color: var(--blue); }
+    .method-card.nnunet { border-top-color: var(--green); }
+    .method-card.otsu  { border-top-color: var(--dgray); }
+    .method-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+    .method-card .dice { font-size: 1.6rem; font-weight: 700; margin: 8px 0 4px; }
+    .method-card .dice-lbl { font-size: 0.72rem; color: var(--dgray); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
+    .method-card ul { padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .method-card ul li { font-size: 0.82rem; color: var(--lgray); padding-left: 14px; position: relative; }
+    .method-card ul li::before { content: '▸'; position: absolute; left: 0; color: inherit; opacity: 0.6; }
+    .tag { display: inline-block; background: rgba(255,255,255,0.07); border-radius: 99px; padding: 2px 9px; font-size: 0.7rem; color: var(--lgray); margin: 2px 2px 0 0; }
+
+    /* ── Info banner ── */
+    .info-banner {
+      background: var(--dark);
+      border-left: 4px solid var(--orange);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 18px;
+      font-size: 0.85rem;
+      color: var(--lgray);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="dot"></div>
+  <div>
+    <h1>Автоматическая сегментация коленного сустава по МРТ</h1>
+    <p>Otsu + морфология + связные компоненты  |  Синий = кость  |  Зелёный = хрящ</p>
+  </div>
+</header>
+
+<main>
+
+  <!-- Sample images -->
+  <div class="samples-section">
+    <div class="sec-title">🩻 Выбери готовый снимок — сегментация запустится автоматически</div>
+    <div class="samples-grid">
+      <div class="sample-thumb" id="st-0" onclick="loadSample('kl0.png',this)">
+        <img src="/static/samples/kl0.png" alt="KL-0" />
+        <span class="kl-badge" style="background:#00cc99">KL-0</span>
+        <span class="kl-name">Норма</span>
+      </div>
+      <div class="sample-thumb" id="st-1" onclick="loadSample('kl1.png',this)">
+        <img src="/static/samples/kl1.png" alt="KL-1" />
+        <span class="kl-badge" style="background:#0099ff">KL-1</span>
+        <span class="kl-name">Ранняя</span>
+      </div>
+      <div class="sample-thumb" id="st-2" onclick="loadSample('kl2.png',this)">
+        <img src="/static/samples/kl2.png" alt="KL-2" />
+        <span class="kl-badge" style="background:#ff9900">KL-2</span>
+        <span class="kl-name">Умеренная</span>
+      </div>
+      <div class="sample-thumb" id="st-3" onclick="loadSample('kl3.png',this)">
+        <img src="/static/samples/kl3.png" alt="KL-3" />
+        <span class="kl-badge" style="background:#ff6633">KL-3</span>
+        <span class="kl-name">Выраженная</span>
+      </div>
+      <div class="sample-thumb" id="st-4" onclick="loadSample('kl4.png',this)">
+        <img src="/static/samples/kl4.png" alt="KL-4" />
+        <span class="kl-badge" style="background:#ff4455">KL-4</span>
+        <span class="kl-name">Тяжёлая</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload -->
+  <div class="upload-zone" id="drop-zone">
+    <input type="file" id="file-input" accept="image/*" />
+    <div class="icon">🩻</div>
+    <div id="drop-label"><strong>Перетащи МРТ-снимок</strong> или нажми чтобы выбрать</div>
+    <div class="hint">PNG, JPG и другие форматы — любой размер</div>
+  </div>
+
+  <button id="run-btn" disabled>Запустить сегментацию</button>
+
+  <div id="spinner"><span class="spin"></span>Обрабатывается…</div>
+  <div id="error-msg"></div>
+
+  <!-- Step-by-step pipeline -->
+  <div class="steps-section" id="steps-section">
+    <div class="sec-title">🔍 Пошаговая визуализация алгоритма</div>
+    <div class="steps-grid">
+      <div class="step-card s1">
+        <img id="step1-img" src="" alt="step1" />
+        <div class="step-num" style="color:var(--dgray)">Шаг 1</div>
+        <div class="step-desc">Нормализация
+          исходного снимка
+          0–255</div>
+      </div>
+      <div class="step-card s2">
+        <img id="step2-img" src="" alt="step2" />
+        <div class="step-num" style="color:var(--orange)">Шаг 2</div>
+        <div class="step-desc">Отсу →1: Ткань • Фон</div>
+        <div class="step-val" id="step2-t1"></div>
+      </div>
+      <div class="step-card s3">
+        <img id="step3-img" src="" alt="step3" />
+        <div class="step-num" style="color:var(--blue)">Шаг 3</div>
+        <div class="step-desc">Отсу →2: Кость • Хрящ</div>
+        <div class="step-val" id="step3-t2"></div>
+      </div>
+      <div class="step-card s4">
+        <img id="step4-img" src="" alt="step4" />
+        <div class="step-num" style="color:var(--green)">Шаг 4</div>
+        <div class="step-desc">Морфология +
+          финальный оверлей</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="results" id="results">
+
+    <div class="stats-bar" id="stats-bar">
+      <div class="stat-card">
+        <div class="val" id="stat-bone">—</div>
+        <div class="lbl">🔵 Кость (bone), %</div>
+      </div>
+      <div class="stat-card green">
+        <div class="val" id="stat-cart">—</div>
+        <div class="lbl">🟢 Хрящ (cartilage), %</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="val" id="stat-comp">—</div>
+        <div class="lbl">Найдено компонент</div>
+      </div>
+      <div class="stat-card dgray">
+        <div class="val" id="stat-dice">—</div>
+        <div class="lbl">Dice кость (bone)</div>
+      </div>
+    </div>
+
+    <div class="image-row">
+      <div class="img-card">
+        <h3>Исходный МРТ-снимок</h3>
+        <img id="img-original" src="" alt="original" />
+      </div>
+      <div class="img-card">
+        <h3>Маска сегментации</h3>
+        <img id="img-overlay" src="" alt="overlay" />
+      </div>
+    </div>
+
+    <div class="legend">
+      <strong style="color:var(--lgray)">Легенда:</strong>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#5080ff"></div>
+        <span>Кость (bone) — самая большая связная компонента</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#32dc78"></div>
+        <span>Хрящ (cartilage) — остальные компоненты</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--dark); border:1px solid var(--dgray)"></div>
+        <span>Фон — ниже порога Otsu</span>
+      </div>
+    </div>
+
+    <div class="info-banner">
+      <strong>Метод:</strong> алгоритм Otsu автоматически находит порог яркости, морфологическое закрытие
+      заполняет пробелы, затем связные компоненты разделяют кость и хрящ.
+      Bone Dice <strong>0.68–0.93</strong>, Cartilage Dice <strong>0.05–0.75</strong> (лучше для ранних стадий KL-0/1).
+      Нейросеть U-Net даёт <strong>0.85–0.90</strong> для всех стадий.
+    </div>
+
+  </div>
+
+  <!-- Methods comparison -->
+  <div class="comparison-section">
+    <h2>📊 Сравнение методов сегментации</h2>
+    <p class="sub">Чем отличается наш Otsu от U-Net и nnU-Net — и какие техники дают высокий Dice</p>
+    <div class="method-cards">
+
+      <div class="method-card otsu">
+        <h3 style="color:var(--dgray)">Otsu (наш метод)</h3>
+        <div class="dice" style="color:var(--dgray)">0.20–0.35</div>
+        <div class="dice-lbl">Dice Score (bone)</div>
+        <ul>
+          <li>Простой порог по гистограмме яркостей</li>
+          <li>Морфологическое закрытие (ядро 5×5)</li>
+          <li>Связные компоненты → кость/хрящ</li>
+          <li>Не требует обучения и GPU</li>
+          <li>Работает &lt; 0.1 сек на любом снимке</li>
+          <li><strong>Проблема:</strong> кость и хрящ похожи по яркости — Otsu их не разделяет точно</li>
+        </ul>
+        <div style="margin-top:10px">
+          <span class="tag">OpenCV</span>
+          <span class="tag">No ML</span>
+          <span class="tag">No GPU</span>
+        </div>
+      </div>
+
+      <div class="method-card unet">
+        <h3 style="color:var(--blue)">U-Net (нейросеть)</h3>
+        <div class="dice" style="color:var(--blue)">0.85–0.90</div>
+        <div class="dice-lbl">Dice Score (bone)</div>
+        <ul>
+          <li>Encoder–Decoder CNN со skip-соединениями</li>
+          <li>Обучается на парах: МРТ + маска эксперта</li>
+          <li>Аугментация: горизонтальный/вертикальный flip</li>
+          <li>Аугментация: случайный поворот ±30°</li>
+          <li>Аугментация: случайная яркость/контраст</li>
+          <li>Аугментация: добавление Гауссова шума</li>
+          <li>Обучение: ~100 эпох, loss = BCE + Dice</li>
+        </ul>
+        <div style="margin-top:10px">
+          <span class="tag">PyTorch</span>
+          <span class="tag">Supervised</span>
+          <span class="tag">GPU</span>
+          <span class="tag">Data Aug</span>
+        </div>
+      </div>
+
+      <div class="method-card nnunet">
+        <h3 style="color:var(--green)">nnU-Net (авто-конфигурация)</h3>
+        <div class="dice" style="color:var(--green)">0.90–0.95</div>
+        <div class="dice-lbl">Dice Score (bone)</div>
+        <ul>
+          <li>U-Net с автоматическим подбором архитектуры</li>
+          <li>Elastic deformation — нелинейные деформации ткани</li>
+          <li>Gamma correction — изменение кривой яркости</li>
+          <li>Mirroring + scaling — геометрические трансформации</li>
+          <li>Gaussian noise + blur — имитация артефактов МРТ</li>
+          <li>Test-time augmentation (TTA) — усреднение предсказаний</li>
+          <li>Ансамбль 2D + 3D моделей</li>
+        </ul>
+        <div style="margin-top:10px">
+          <span class="tag">PyTorch</span>
+          <span class="tag">AutoML</span>
+          <span class="tag">GPU</span>
+          <span class="tag">Elastic Aug</span>
+          <span class="tag">TTA</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="info-banner" style="margin-top:16px">
+      <strong>Почему Otsu → 0.20–0.35, а U-Net → 0.85–0.90?</strong>
+      Otsu делит изображение на 2 класса (ткань/фон), но кость и хрящ имеют похожие значения пикселей.
+      U-Net видел тысячи размеченных МРТ и выучил сложные признаки формы и текстуры.
+      nnU-Net добавляет elastic deformation и TTA — это имитирует реальную вариативность снимков и ещё повышает точность.
+    </div>
+  </div>
+
+</main>
+
+<script>
+  const fileInput   = document.getElementById('file-input');
+  const dropZone    = document.getElementById('drop-zone');
+  const runBtn      = document.getElementById('run-btn');
+  const spinner     = document.getElementById('spinner');
+  const errorMsg    = document.getElementById('error-msg');
+  const results     = document.getElementById('results');
+  const dropLabel   = document.getElementById('drop-label');
+
+  let selectedFile = null;
+
+  function setFile(file) {
+    selectedFile = file;
+    dropLabel.innerHTML = `<strong>${file.name}</strong> (${(file.size/1024).toFixed(1)} KB) — готово к анализу`;
+    runBtn.disabled = false;
+  }
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files[0]) setFile(fileInput.files[0]);
+  });
+
+  async function loadSample(filename, el) {
+    // highlight selected thumbnail
+    document.querySelectorAll('.sample-thumb').forEach(t => t.classList.remove('active'));
+    if (el) el.classList.add('active');
+    // fetch image as blob, create File
+    const resp = await fetch(`/static/samples/${filename}`);
+    const blob = await resp.blob();
+    const file = new File([blob], filename, { type: 'image/png' });
+    setFile(file);
+    // auto-run segmentation
+    runBtn.click();
+  }
+
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag'); });
+  dropZone.addEventListener('dragleave', ()  => dropZone.classList.remove('drag'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('drag');
+    if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
+  });
+
+  runBtn.addEventListener('click', async () => {
+    if (!selectedFile) return;
+    runBtn.disabled = true;
+    spinner.classList.add('visible');
+    results.classList.remove('visible');
+    errorMsg.classList.remove('visible');
+
+    const form = new FormData();
+    form.append('file', selectedFile);
+
+    try {
+      const resp = await fetch('/predict', { method: 'POST', body: form });
+      const data = await resp.json();
+
+      if (!resp.ok) throw new Error(data.error || 'Server error');
+
+      document.getElementById('img-original').src = data.original_b64;
+      document.getElementById('img-overlay').src  = data.overlay_b64;
+      document.getElementById('stat-bone').textContent = data.bone_pct + '%';
+      document.getElementById('stat-cart').textContent = data.cart_pct + '%';
+      document.getElementById('stat-comp').textContent = data.n_components;
+      document.getElementById('stat-dice').textContent = data.dice_range;
+
+      // Step images
+      document.getElementById('step1-img').src = data.step1_b64;
+      document.getElementById('step2-img').src = data.step2_b64;
+      document.getElementById('step3-img').src = data.step3_b64;
+      document.getElementById('step4-img').src = data.overlay_b64;
+      document.getElementById('step2-t1').textContent = `t₁=${data.t1}`;
+      document.getElementById('step3-t2').textContent = `t₂=${data.t2}`;
+      document.getElementById('steps-section').classList.add('visible');
+
+      results.classList.add('visible');
+    } catch (err) {
+      errorMsg.textContent = 'Ошибка: ' + err.message;
+      errorMsg.classList.add('visible');
+    } finally {
+      spinner.classList.remove('visible');
+      runBtn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
