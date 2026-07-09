@@ -1,7 +1,0 @@
-numpy
-opencv-python
-scipy
-scikit-image
-fastapi
-uvicorn[standard]
-python-multipart

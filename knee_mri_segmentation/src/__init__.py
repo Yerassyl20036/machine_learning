@@ -1,1 +1,0 @@
-# Knee MRI Segmentation Package

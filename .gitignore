@@ -20,11 +20,13 @@ iris/
 iris.zip
 *.zip
 
-# Binary document outputs
+# Binary document outputs (generated — keep out of repo)
 *.pdf
 *.docx
+# Exception: project reports in docs/
+!docs/*.pdf
 
-# Separate git repositories — tracked independently
+# Separate git repositories — now merged into knee_mri/ parent
 knee_mri_segment/
 knee_mri_classification/
 

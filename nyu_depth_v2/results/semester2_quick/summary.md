@@ -1,0 +1,7 @@
+# Semester 2 Quick Results
+
+| experiment | miou | pixel_acc | mean_acc | fw_iou | dice | rmse | absrel | delta1 | delta2 | delta3 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| seg_baseline | 0.5824701104655513 | 0.9445891203703703 | 0.6602231694217836 | 0.901785876938344 | 0.6187031329947003 | nan | nan | nan | nan | nan |
+| seg_improved | 0.9576809698418072 | 0.9899329668209876 | 0.9918252703802378 | 0.9804496368072456 | 0.978109659281681 | nan | nan | nan | nan | nan |
+| reconstruction_tsdf | nan | nan | nan | nan | nan | 0.0074709297914523 | 0.0047568896552547 | 1.0 | 1.0 | 1.0 |

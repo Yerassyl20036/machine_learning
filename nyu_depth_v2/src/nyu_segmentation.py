@@ -36,9 +36,10 @@ class Sample:
 
 
 class NYUSegDataset(Dataset):
-    def __init__(self, samples: List[Sample], size: Tuple[int, int]) -> None:
+    def __init__(self, samples: List[Sample], size: Tuple[int, int], augment: bool = False) -> None:
         self.samples = samples
         self.size = size
+        self.augment = augment
 
     def __len__(self) -> int:
         return len(self.samples)
@@ -50,6 +51,18 @@ class NYUSegDataset(Dataset):
 
         rgb = rgb.resize(self.size, Image.BILINEAR)
         label = label.resize(self.size, Image.NEAREST)
+
+        if self.augment and np.random.rand() < 0.5:
+            rgb = rgb.transpose(Image.FLIP_LEFT_RIGHT)
+            label = label.transpose(Image.FLIP_LEFT_RIGHT)
+
+        if self.augment:
+            arr = np.array(rgb).astype(np.float32)
+            # Lightweight color/noise augmentation for CPU-friendly training.
+            arr = arr * np.random.uniform(0.9, 1.1)
+            arr = arr + np.random.normal(0.0, 4.0, size=arr.shape)
+            arr = np.clip(arr, 0, 255).astype(np.uint8)
+            rgb = Image.fromarray(arr)
 
         rgb = torch.from_numpy(np.array(rgb)).float().permute(2, 0, 1) / 255.0
         label = torch.from_numpy(np.array(label)).long()
@@ -118,14 +131,27 @@ def infer_num_classes(meta: pd.DataFrame, sample_count: int = 50) -> int:
     return int(max(labels)) + 1
 
 
-def train_epoch(model, loader, optimizer, device) -> float:
+def compute_class_weights(samples: List[Sample], num_classes: int) -> torch.Tensor:
+    counts = np.zeros(num_classes, dtype=np.float64)
+    for sample in samples:
+        label = np.array(Image.open(sample.label_path))
+        binc = np.bincount(label.flatten(), minlength=num_classes).astype(np.float64)
+        counts += binc
+
+    counts = np.maximum(counts, 1.0)
+    inv_freq = counts.sum() / counts
+    weights = inv_freq / inv_freq.mean()
+    return torch.tensor(weights, dtype=torch.float32)
+
+
+def train_epoch(model, loader, optimizer, device, criterion) -> float:
     model.train()
     total_loss = 0.0
     for _, rgb, label in loader:
         rgb = rgb.to(device)
         label = label.to(device)
         logits = model(rgb)
-        loss = F.cross_entropy(logits, label)
+        loss = criterion(logits, label)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
@@ -255,18 +281,25 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--train-limit", type=int, default=240, help="Train samples limit.")
     parser.add_argument("--test-limit", type=int, default=120, help="Test samples limit.")
     parser.add_argument("--skip-db", action="store_true", help="Skip writing DB metrics.")
+    parser.add_argument("--use-aug", action="store_true", help="Enable lightweight train augmentations.")
+    parser.add_argument("--weighted-loss", action="store_true", help="Use class-weighted cross-entropy.")
+    parser.add_argument("--use-scheduler", action="store_true", help="Enable StepLR scheduler.")
+    parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility.")
     return parser
 
 
 def main() -> None:
     args = build_parser().parse_args()
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+
     meta = pd.read_csv(args.metadata)
 
     num_classes = infer_num_classes(meta)
     train_samples = build_samples(meta, "train", args.train_limit)
     test_samples = build_samples(meta, "test", args.test_limit)
 
-    train_ds = NYUSegDataset(train_samples, tuple(args.size))
+    train_ds = NYUSegDataset(train_samples, tuple(args.size), augment=args.use_aug)
     test_ds = NYUSegDataset(test_samples, tuple(args.size))
 
     train_loader = DataLoader(train_ds, batch_size=args.batch, shuffle=True)
@@ -275,13 +308,23 @@ def main() -> None:
     device = torch.device("cpu")
     model = TinyUNet(3, num_classes).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.7) if args.use_scheduler else None
+
+    if args.weighted_loss:
+        class_weights = compute_class_weights(train_samples, num_classes).to(device)
+        criterion = nn.CrossEntropyLoss(weight=class_weights)
+    else:
+        criterion = nn.CrossEntropyLoss()
 
     ensure_dir(args.results)
 
     history = []
     for epoch in range(args.epochs):
-        loss = train_epoch(model, train_loader, optimizer, device)
-        history.append({"epoch": epoch + 1, "loss": loss})
+        loss = train_epoch(model, train_loader, optimizer, device, criterion)
+        lr = float(optimizer.param_groups[0]["lr"])
+        history.append({"epoch": epoch + 1, "loss": loss, "lr": lr})
+        if scheduler is not None:
+            scheduler.step()
 
     metrics = evaluate(model, test_loader, device, num_classes)
 
