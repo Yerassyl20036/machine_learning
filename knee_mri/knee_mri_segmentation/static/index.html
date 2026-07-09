@@ -240,57 +240,6 @@
       color: var(--lgray);
       line-height: 1.5;
     }
-
-    /* ── Meniscus classification panel ── */
-    #classify-btn {
-      background: var(--dark);
-      color: var(--green);
-      border: 2px solid var(--green);
-      border-radius: 8px;
-      padding: 12px 36px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-      width: 100%;
-    }
-    #classify-btn:hover { background: var(--green); color: var(--bg); }
-    #classify-btn:disabled { border-color: var(--dgray); color: var(--dgray); cursor: default; }
-
-    #classify-result {
-      display: none;
-      background: var(--card);
-      border-radius: 12px;
-      padding: 24px 28px;
-      border-top: 4px solid var(--green);
-    }
-    #classify-result.visible { display: block; }
-    #classify-result.torn { border-top-color: #ff4455; }
-
-    .classify-verdict {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      margin-bottom: 16px;
-    }
-    .verdict-badge {
-      font-size: 2.2rem;
-      font-weight: 700;
-    }
-    .verdict-badge.normal { color: var(--green); }
-    .verdict-badge.torn   { color: #ff4455; }
-    .verdict-meta { font-size: 0.85rem; color: var(--dgray); }
-    .verdict-meta strong { color: var(--white); }
-
-    .prob-bar-wrap { margin: 12px 0; }
-    .prob-bar-label { font-size: 0.78rem; color: var(--dgray); margin-bottom: 4px; display: flex; justify-content: space-between; }
-    .prob-bar-track { background: var(--dark); border-radius: 99px; height: 10px; overflow: hidden; }
-    .prob-bar-fill  { height: 100%; border-radius: 99px; transition: width 0.6s ease; }
-    .prob-bar-fill.normal { background: var(--green); }
-    .prob-bar-fill.torn   { background: #ff4455; }
-
-    .top-features { font-size: 0.8rem; color: var(--dgray); margin-top: 12px; }
-    .top-features span { color: var(--lgray); }
   </style>
 </head>
 <body>
@@ -346,31 +295,9 @@
   </div>
 
   <button id="run-btn" disabled>Запустить сегментацию</button>
-  <button id="classify-btn" disabled>Классифицировать надрыв мениска (RF)</button>
 
   <div id="spinner"><span class="spin"></span>Обрабатывается…</div>
-  <div id="cls-spinner" style="display:none;text-align:center;padding:16px;color:var(--dgray)"><span class="spin"></span>Классификация…</div>
   <div id="error-msg"></div>
-
-  <!-- Meniscus classification result -->
-  <div id="classify-result">
-    <div class="classify-verdict">
-      <div class="verdict-badge" id="verdict-badge">—</div>
-      <div>
-        <div style="font-size:1.1rem;font-weight:700" id="verdict-label">—</div>
-        <div class="verdict-meta">Confidence: <strong id="verdict-conf">—</strong></div>
-      </div>
-    </div>
-    <div class="prob-bar-wrap">
-      <div class="prob-bar-label"><span>Normal</span><span id="prob-normal-val">—</span></div>
-      <div class="prob-bar-track"><div class="prob-bar-fill normal" id="prob-normal-bar" style="width:0%"></div></div>
-    </div>
-    <div class="prob-bar-wrap">
-      <div class="prob-bar-label"><span>Torn</span><span id="prob-torn-val">—</span></div>
-      <div class="prob-bar-track"><div class="prob-bar-fill torn" id="prob-torn-bar" style="width:0%"></div></div>
-    </div>
-    <div class="top-features">Top features: <span id="top-features-list">—</span></div>
-  </div>
 
   <!-- Step-by-step pipeline -->
   <div class="steps-section" id="steps-section">
@@ -546,13 +473,10 @@
   const fileInput   = document.getElementById('file-input');
   const dropZone    = document.getElementById('drop-zone');
   const runBtn      = document.getElementById('run-btn');
-  const clsBtn      = document.getElementById('classify-btn');
   const spinner     = document.getElementById('spinner');
-  const clsSpinner  = document.getElementById('cls-spinner');
   const errorMsg    = document.getElementById('error-msg');
   const results     = document.getElementById('results');
   const dropLabel   = document.getElementById('drop-label');
-  const clsResult   = document.getElementById('classify-result');
 
   let selectedFile = null;
 
@@ -560,7 +484,6 @@
     selectedFile = file;
     dropLabel.innerHTML = `<strong>${file.name}</strong> (${(file.size/1024).toFixed(1)} KB) — готово к анализу`;
     runBtn.disabled = false;
-    clsBtn.disabled = false;
   }
 
   fileInput.addEventListener('change', () => {
@@ -586,46 +509,6 @@
     e.preventDefault();
     dropZone.classList.remove('drag');
     if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
-  });
-
-  clsBtn.addEventListener('click', async () => {
-    if (!selectedFile) return;
-    clsBtn.disabled = true;
-    clsSpinner.style.display = 'block';
-    clsResult.classList.remove('visible', 'torn');
-    errorMsg.classList.remove('visible');
-
-    const form = new FormData();
-    form.append('file', selectedFile);
-
-    try {
-      const resp = await fetch('/classify', { method: 'POST', body: form });
-      const data = await resp.json();
-
-      if (!resp.ok) throw new Error(data.error || 'Server error');
-
-      const isTorn = data.label === 1;
-      const normalProb = Math.round(100 - data.torn_prob);
-
-      document.getElementById('verdict-badge').textContent = isTorn ? 'TORN' : 'NORMAL';
-      document.getElementById('verdict-badge').className = 'verdict-badge ' + (isTorn ? 'torn' : 'normal');
-      document.getElementById('verdict-label').textContent = data.label_name;
-      document.getElementById('verdict-conf').textContent = data.confidence + '%';
-      document.getElementById('prob-normal-val').textContent = normalProb + '%';
-      document.getElementById('prob-torn-val').textContent = data.torn_prob + '%';
-      document.getElementById('prob-normal-bar').style.width = normalProb + '%';
-      document.getElementById('prob-torn-bar').style.width = data.torn_prob + '%';
-      document.getElementById('top-features-list').textContent = data.top_features.join(' | ');
-
-      clsResult.classList.add('visible');
-      if (isTorn) clsResult.classList.add('torn');
-    } catch (err) {
-      errorMsg.textContent = 'Classification error: ' + err.message;
-      errorMsg.classList.add('visible');
-    } finally {
-      clsSpinner.style.display = 'none';
-      clsBtn.disabled = false;
-    }
   });
 
   runBtn.addEventListener('click', async () => {
