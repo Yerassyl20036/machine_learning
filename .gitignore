@@ -26,6 +26,10 @@ iris.zip
 # Exception: project reports in docs/
 !docs/*.pdf
 
+# Personal exam materials — not part of the project
+exams/
+documents/
+
 # Separate git repositories — now merged into knee_mri/ parent
 knee_mri_segment/
 knee_mri_classification/
